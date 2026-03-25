@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import EvolucaoAlunos from "@/components/EvolucaoAlunos";
 import Conquistas from "@/components/Conquistas";
-import MentorEstrategico from "@/components/MentorEstrategico"; // <-- Importado aqui
+import MentorEstrategico from "@/components/MentorEstrategico";
+import ContagemRegressiva from "@/components/ContagemRegressiva"; // <-- Importado aqui
 import { missoes } from "@/data/questoes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,18 +43,23 @@ export default function Index() {
         </div>
       </div>
 
+      {/* SEÇÃO DE URGÊNCIA: CRONÔMETRO (Primeira coisa que o aluno vê) */}
+      <section className="animate-reveal" style={{ animationDelay: '50ms' }}>
+        <ContagemRegressiva />
+      </section>
+
       {/* MENTOR ESTRATÉGICO (Análise de Pontos Cegos) */}
-      <section className="animate-reveal">
+      <section className="animate-reveal" style={{ animationDelay: '150ms' }}>
         <MentorEstrategico />
       </section>
 
       {/* SEÇÃO DE EVOLUÇÃO E CONQUISTAS */}
       <div className="space-y-8">
-        <section>
+        <section className="animate-reveal" style={{ animationDelay: '250ms' }}>
           <EvolucaoAlunos />
         </section>
 
-        <section className="animate-reveal" style={{ animationDelay: '200ms' }}>
+        <section className="animate-reveal" style={{ animationDelay: '350ms' }}>
           <Conquistas />
         </section>
       </div>
