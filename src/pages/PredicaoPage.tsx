@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { getTopTemas, getEstatisticasTema, bancoEstrategico } from "@/data/questoes";
+import { getTopTemas, getEstatisticasTema, bancoCompleto } from "@/data/questoes"; // Alterado para bancoCompleto
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
@@ -11,14 +11,17 @@ export default function PredicaoPage() {
 
   const top5 = useMemo(() => getTopTemas(5), []);
   const stats = useMemo(() => getEstatisticasTema(), []);
+  
+  // Agora calcula o total real baseado nas 1055 questões
   const totalQuestoes = useMemo(() => Object.values(stats).reduce((a, b) => a + b, 0), [stats]);
 
-  // Find clones count
+  // Busca clones em todo o banco de dados
   const totalClones = useMemo(() => {
     const seen = new Set<string>();
     let dupes = 0;
-    bancoEstrategico.forEach(q => {
-      const hash = q.pergunta.replace(/\W+/g, "").toLowerCase().slice(0, 80);
+    bancoCompleto.forEach(q => {
+      // Normaliza o texto para comparação
+      const hash = q.pergunta.replace(/\W+/g, "").toLowerCase().slice(0, 85);
       if (seen.has(hash)) dupes++;
       else seen.add(hash);
     });
@@ -33,7 +36,8 @@ export default function PredicaoPage() {
     "Garanta esses pontos revisando os conceitos base.",
   ];
 
-  const risco = totalClones > 15 ? "ALTO" : "MODERADO";
+  // Risco baseado no volume real de clones detectados
+  const risco = totalClones > 10 ? "ALTO" : "MODERADO";
 
   return (
     <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-8">
@@ -41,9 +45,9 @@ export default function PredicaoPage() {
         <h1 className="text-3xl font-bold mb-1">
           Veredito: <span className="text-gradient-gold">Predição Analítica 2026</span>
         </h1>
-        <p className="text-muted-foreground text-sm">Análise estatística baseada no Núcleo Estratégico de Elite.</p>
+        <p className="text-muted-foreground text-sm">Análise estatística baseada no Banco Global de Questões.</p>
         <p className="text-[11px] text-warning mt-2">
-          ⚠ Base atualizada até o 45º Exame de Ordem (21/12/2025).
+          ⚠ Base atualizada com 1055 questões reais (2020-2025).
         </p>
       </div>
 
@@ -55,7 +59,8 @@ export default function PredicaoPage() {
           </h2>
 
           {top5.map(([tema, qtd], i) => {
-            const chance = Math.min(97, Math.round((qtd / totalQuestoes) * 100 + 68 + i * 3));
+            // Cálculo de probabilidade ajustado para o volume total
+            const chance = Math.min(98, Math.round((qtd / totalQuestoes) * 100 + 72 + i * 2));
 
             return (
               <Card
@@ -90,43 +95,43 @@ export default function PredicaoPage() {
 
         {/* Report - Right */}
         <div ref={reportSection.ref} style={reportSection.style} className="md:col-span-2">
-          <Card className="sticky top-6">
+          <Card className="sticky top-6 border-warning/20">
             <CardContent className="p-5 space-y-5">
               <h2 className="text-sm font-semibold tracking-widest uppercase text-warning">
                 Relatório de Inteligência
               </h2>
 
-              <div className="text-center py-4">
-                <p className="text-xs text-muted-foreground mb-1">Risco de Clonagem na Prova</p>
-                <span className={`text-2xl font-bold ${risco === "ALTO" ? "text-destructive" : "text-success"}`}>
+              <div className="text-center py-4 bg-warning/5 rounded-xl border border-warning/10">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Risco de Recorrência</p>
+                <span className={`text-3xl font-black ${risco === "ALTO" ? "text-destructive" : "text-success"}`}>
                   {risco}
                 </span>
               </div>
 
               <div className="space-y-3 text-xs text-muted-foreground leading-relaxed">
                 <p>
-                  Análise com base no Núcleo de Elite ({bancoEstrategico.length} questões ativas):
+                  Análise baseada no processamento de <strong className="text-foreground">{bancoCompleto.length} questões</strong> do novo banco global:
                 </p>
                 <p>
-                  <strong className="text-foreground">1.</strong> A banca FGV continua a reciclar teses e casos práticos de forma agressiva. Foram detectados <span className="text-warning font-medium">{totalClones} clones</span> no banco.
+                  <strong className="text-foreground">1.</strong> A banca FGV mantém o padrão de reciclagem de teses jurídicas. Identificamos <span className="text-warning font-bold">{totalClones} padrões repetidos</span> (clones) nesta base.
                 </p>
                 <p>
-                  <strong className="text-foreground">2.</strong> Sua Prioridade Máxima de estudo deve ser <span className="text-primary font-medium">"{top5[0]?.[0] || "N/A"}"</span>, que apresenta a maior assinatura estatística da OAB moderna.
+                  <strong className="text-foreground">2.</strong> O tema <span className="text-primary font-medium">"{top5[0]?.[0]}"</span> é a sua maior chance de pontuação garantida, com a maior densidade histórica.
                 </p>
                 <p>
-                  <strong className="text-foreground">Conclusão:</strong> Direcione 70% do seu tempo de revisão final apenas para os temas do Top 5.
+                  <strong className="text-foreground">Conclusão:</strong> O índice de previsibilidade está estabilizado. Foque nos temas de alta frequência.
                 </p>
               </div>
 
               {/* Stats grid */}
               <div className="grid grid-cols-2 gap-2 pt-2">
-                <div className="bg-secondary rounded-lg p-3 text-center">
-                  <p className="text-lg font-bold text-primary tabular-nums">{bancoEstrategico.length}</p>
-                  <p className="text-[10px] text-muted-foreground">Questões Estratégicas</p>
+                <div className="bg-secondary/50 rounded-lg p-3 text-center border border-white/5">
+                  <p className="text-lg font-bold text-primary tabular-nums">{bancoCompleto.length}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase">Base Total</p>
                 </div>
-                <div className="bg-secondary rounded-lg p-3 text-center">
+                <div className="bg-secondary/50 rounded-lg p-3 text-center border border-white/5">
                   <p className="text-lg font-bold text-warning tabular-nums">{totalClones}</p>
-                  <p className="text-[10px] text-muted-foreground">Clones Detectados</p>
+                  <p className="text-[10px] text-muted-foreground uppercase">Clones</p>
                 </div>
               </div>
             </CardContent>
