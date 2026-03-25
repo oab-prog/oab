@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import EvolucaoAlunos from "@/components/EvolucaoAlunos";
+import Conquistas from "@/components/Conquistas"; // <-- Importado aqui
 import { missoes } from "@/data/questoes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,10 +41,16 @@ export default function Index() {
         </div>
       </div>
 
-      {/* COMPONENTE DE EVOLUÇÃO (O que acabamos de criar!) */}
-      <section className="space-y-4">
-        <EvolucaoAlunos />
-      </section>
+      {/* SEÇÃO DE EVOLUÇÃO E CONQUISTAS */}
+      <div className="space-y-8">
+        <section>
+          <EvolucaoAlunos />
+        </section>
+
+        <section className="animate-reveal" style={{ animationDelay: '200ms' }}>
+          <Conquistas />
+        </section>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Lado Esquerdo: Navegação Rápida */}
