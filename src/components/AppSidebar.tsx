@@ -1,4 +1,4 @@
-import { Home, Crosshair, Search, BarChart3, Scale, BookOpen } from "lucide-react";
+import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -15,6 +15,7 @@ import {
 const items = [
   { title: "Início", url: "/", icon: Home },
   { title: "Simulado Real", url: "/simulado", icon: Crosshair },
+  { title: "Dominando Ética", url: "/etica", icon: Sparkles }, // <-- NOVA ABA ESTRATÉGICA
   { title: "Buscador", url: "/buscador", icon: Search },
   { title: "Radar de Recorrência", url: "/radar", icon: BarChart3 },
   { title: "Veredito e Predição", url: "/predicao", icon: Scale },
@@ -27,12 +28,11 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border">
+    <Sidebar collapsible="icon" className="border-r border-border bg-sidebar">
       <SidebarContent className="pt-6">
         <div className="px-4 mb-8">
           {!collapsed ? (
             <div className="flex items-center gap-3">
-              {/* USANDO O LINK "SUPER SEGURO" DO GITHUB */}
               <img 
                 src="https://raw.githubusercontent.com/oab-prog/oab/main/logo.png" 
                 alt="Logo JurisVision" 
@@ -69,19 +69,19 @@ export function AppSidebar() {
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
                       >
-                        <item.icon className="h-4 w-4 shrink-0" />
+                        <item.icon className={`h-4 w-4 shrink-0 ${item.title === "Dominando Ética" ? "text-gold" : ""}`} />
                         {!collapsed && <span className="text-sm">{item.title}</span>}
                       </a>
                     ) : (
                       <NavLink
                         to={item.url}
                         end={item.url === "/"}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-200"
-                        activeClassName="bg-primary/10 text-primary font-medium border border-primary/20"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
+                        activeClassName="bg-primary/10 text-primary font-bold border-l-2 border-primary rounded-l-none"
                       >
-                        <item.icon className="h-4 w-4 shrink-0" />
+                        <item.icon className={`h-4 w-4 shrink-0 ${item.title === "Dominando Ética" && location.pathname !== "/etica" ? "text-gold/70" : ""}`} />
                         {!collapsed && <span className="text-sm">{item.title}</span>}
                       </NavLink>
                     )}
