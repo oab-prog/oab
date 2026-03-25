@@ -4,11 +4,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
-import Index from "@/pages/Index"; // <-- IMPORTAMOS O NOVO INDEX AQUI
+import Index from "@/pages/Index";
 import SimuladoPage from "@/pages/SimuladoPage";
 import BuscadorPage from "@/pages/BuscadorPage";
 import RadarPage from "@/pages/RadarPage";
 import PredicaoPage from "@/pages/PredicaoPage";
+import EticaFlashcards from "@/pages/EticaFlashcards"; // <-- NOVA IMPORTAÇÃO
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,12 +22,12 @@ const App = () => (
       <HashRouter>
         <AppLayout>
           <Routes>
-            {/* AGORA O "/" APONTA PARA O INDEX (NOSSA DASHBOARD) */}
             <Route path="/" element={<Index />} /> 
             <Route path="/simulado" element={<SimuladoPage />} />
             <Route path="/buscador" element={<BuscadorPage />} />
             <Route path="/radar" element={<RadarPage />} />
             <Route path="/predicao" element={<PredicaoPage />} />
+            <Route path="/etica" element={<EticaFlashcards />} /> {/* <-- NOVA ROTA */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>
