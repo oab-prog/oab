@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import EvolucaoAlunos from "@/components/EvolucaoAlunos";
-import Conquistas from "@/components/Conquistas"; // <-- Importado aqui
+import Conquistas from "@/components/Conquistas";
+import MentorEstrategico from "@/components/MentorEstrategico"; // <-- Importado aqui
 import { missoes } from "@/data/questoes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,11 @@ export default function Index() {
           <Zap className="h-3 w-3 fill-primary" /> Modo Turbo Ativado
         </div>
       </div>
+
+      {/* MENTOR ESTRATÉGICO (Análise de Pontos Cegos) */}
+      <section className="animate-reveal">
+        <MentorEstrategico />
+      </section>
 
       {/* SEÇÃO DE EVOLUÇÃO E CONQUISTAS */}
       <div className="space-y-8">
