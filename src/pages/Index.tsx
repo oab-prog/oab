@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import EvolucaoAlunos from "@/components/EvolucaoAlunos";
 import Conquistas from "@/components/Conquistas";
 import MentorEstrategico from "@/components/MentorEstrategico";
-import ContagemRegressiva from "@/components/ContagemRegressiva"; // <-- Importado aqui
+import ContagemRegressiva from "@/components/ContagemRegressiva";
+import RadarConhecimento from "@/components/RadarConhecimento"; // <-- NOVO IMPORT
 import { missoes } from "@/data/questoes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,14 +22,13 @@ export default function Index() {
   const navigate = useNavigate();
   const reveal = useScrollReveal();
 
-  // Sorteia uma missão do dia para incentivar o estudo
   const missaoDoDia = useMemo(() => {
     return missoes[Math.floor(Math.random() * missoes.length)];
   }, []);
 
   return (
     <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-10">
-      {/* Cabeçalho de Boas-vindas */}
+      {/* 1. CABEÇALHO */}
       <div ref={reveal.ref} style={reveal.style} className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-4xl font-black tracking-tight">
@@ -43,29 +43,35 @@ export default function Index() {
         </div>
       </div>
 
-      {/* SEÇÃO DE URGÊNCIA: CRONÔMETRO (Primeira coisa que o aluno vê) */}
-      <section className="animate-reveal" style={{ animationDelay: '50ms' }}>
-        <ContagemRegressiva />
-      </section>
+      {/* 2. URGÊNCIA E ESTRATÉGIA */}
+      <div className="space-y-6">
+        <section className="animate-reveal" style={{ animationDelay: '50ms' }}>
+          <ContagemRegressiva />
+        </section>
 
-      {/* MENTOR ESTRATÉGICO (Análise de Pontos Cegos) */}
-      <section className="animate-reveal" style={{ animationDelay: '150ms' }}>
-        <MentorEstrategico />
-      </section>
+        <section className="animate-reveal" style={{ animationDelay: '150ms' }}>
+          <MentorEstrategico />
+        </section>
+      </div>
 
-      {/* SEÇÃO DE EVOLUÇÃO E CONQUISTAS */}
-      <div className="space-y-8">
+      {/* 3. ANÁLISE VISUAL (EVOLUÇÃO + RADAR) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <section className="animate-reveal" style={{ animationDelay: '250ms' }}>
           <EvolucaoAlunos />
         </section>
 
         <section className="animate-reveal" style={{ animationDelay: '350ms' }}>
-          <Conquistas />
+          <RadarConhecimento />
         </section>
       </div>
 
+      {/* 4. GAMIFICAÇÃO */}
+      <section className="animate-reveal" style={{ animationDelay: '450ms' }}>
+        <Conquistas />
+      </section>
+
+      {/* 5. NAVEGAÇÃO E METAS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Lado Esquerdo: Navegação Rápida */}
         <div className="md:col-span-2 space-y-6">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
             Acesso Rápido
@@ -121,7 +127,6 @@ export default function Index() {
           </div>
         </div>
 
-        {/* Lado Direito: Missão e Dica */}
         <div className="space-y-6">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
             Sua Meta
