@@ -1,4 +1,4 @@
-import { getTopTemas, bancoEstrategico } from "@/data/questoes";
+import { getTopTemas, bancoCompleto } from "@/data/questoes"; // Alterado para bancoCompleto
 import { Card, CardContent } from "@/components/ui/card";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from "recharts";
@@ -18,12 +18,15 @@ export default function RadarPage() {
     [topTemas]
   );
 
-  // Find clones (questions with very similar text)
+  // Lógica de Detecção de Clones varrendo o banco de 1055 questões
   const clonesDetectados = useMemo(() => {
     const seen = new Map<string, number>();
-    const dupes: typeof bancoEstrategico = [];
-    bancoEstrategico.forEach(q => {
-      const hash = q.pergunta.replace(/\W+/g, "").toLowerCase().slice(0, 80);
+    const dupes: any[] = []; 
+    
+    bancoCompleto.forEach(q => {
+      // Cria um resumo da pergunta (limpa espaços e caracteres especiais)
+      const hash = q.pergunta.replace(/\W+/g, "").toLowerCase().slice(0, 85);
+      
       if (seen.has(hash)) {
         dupes.push(q);
       } else {
@@ -43,11 +46,11 @@ export default function RadarPage() {
         </h1>
         <p className="text-muted-foreground text-sm">Núcleo Estratégico — Temas mais cobrados pela FGV de 2020 a 2025.</p>
         <p className="text-[11px] text-warning mt-2">
-          ⚠ Base atualizada até o 45º Exame de Ordem (21/12/2025). Estatísticas recalibradas periodicamente.
+          ⚠ Base atualizada com as 1055 questões (Exames 2020-2025). Estatísticas recalibradas.
         </p>
       </div>
 
-      {/* Chart */}
+      {/* Gráfico de Temas */}
       <Card ref={chart.ref} style={chart.style}>
         <CardContent className="p-5">
           <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground mb-4">Top 7 Temas Estratégicos</p>
@@ -84,12 +87,12 @@ export default function RadarPage() {
         </CardContent>
       </Card>
 
-      {/* Clones */}
+      {/* Seção de Clones */}
       <div ref={clones.ref} style={clones.style}>
         <div className="flex items-center gap-3 mb-4">
           <h2 className="text-lg font-semibold">Questões Repetidas (Clones)</h2>
           <span className="text-xs bg-warning/15 text-warning px-2 py-0.5 rounded-full font-medium tabular-nums">
-            {clonesDetectados.length} detectados
+            {clonesDetectados.length} padrões detectados
           </span>
           {clonesDetectados.length > 0 && (
             <Button
@@ -104,15 +107,19 @@ export default function RadarPage() {
         </div>
 
         {clonesDetectados.length > 0 ? (
-          <div className="space-y-2">
-            {clonesDetectados.slice(0, 10).map((c, i) => (
-              <Card key={i}>
+          <div className="grid grid-cols-1 gap-3">
+            {/* Aumentei para mostrar as primeiras 20 detecções */}
+            {clonesDetectados.slice(0, 20).map((c, i) => (
+              <Card key={i} className="border-l-4 border-l-warning/50">
                 <CardContent className="p-4 flex items-start gap-3">
-                  <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded shrink-0 mt-0.5">
-                    {c.tema}
-                  </span>
+                  <div className="flex flex-col gap-1 shrink-0 mt-0.5">
+                    <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase text-center">
+                      {c.tema.split(';')[0]} 
+                    </span>
+                    <span className="text-[9px] text-center text-warning font-bold">PADRÃO REPETIDO</span>
+                  </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    {c.pergunta.slice(0, 120)}...
+                    {c.pergunta.slice(0, 180)}...
                   </p>
                 </CardContent>
               </Card>
@@ -121,7 +128,7 @@ export default function RadarPage() {
         ) : (
           <Card>
             <CardContent className="p-6 text-center">
-              <p className="text-sm text-muted-foreground">Nenhum clone detectado no banco atual.</p>
+              <p className="text-sm text-muted-foreground">Nenhum clone detectado no banco de 1055 questões.</p>
             </CardContent>
           </Card>
         )}
