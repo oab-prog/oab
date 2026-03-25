@@ -4,7 +4,7 @@ import EvolucaoAlunos from "@/components/EvolucaoAlunos";
 import Conquistas from "@/components/Conquistas";
 import MentorEstrategico from "@/components/MentorEstrategico";
 import ContagemRegressiva from "@/components/ContagemRegressiva";
-import RadarConhecimento from "@/components/RadarConhecimento"; // <-- NOVO IMPORT
+import RadarConhecimento from "@/components/RadarConhecimento";
 import { missoes } from "@/data/questoes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -149,9 +149,10 @@ export default function Index() {
             </CardContent>
           </Card>
 
-          <div className="p-4 rounded-xl bg-secondary/10 border border-white/5">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Status do Banco</p>
-            <p className="text-sm font-bold">100% Atualizado (45º Exame)</p>
+          {/* STATUS ATUALIZADO PARA O 46º EXAME */}
+          <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/10 animate-pulse">
+            <p className="text-[10px] text-destructive uppercase tracking-widest mb-1 font-bold">Foco: 46º Exame</p>
+            <p className="text-sm font-bold text-foreground">Banco 100% Atualizado</p>
           </div>
         </div>
       </div>
