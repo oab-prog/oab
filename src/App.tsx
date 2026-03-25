@@ -9,7 +9,8 @@ import SimuladoPage from "@/pages/SimuladoPage";
 import BuscadorPage from "@/pages/BuscadorPage";
 import RadarPage from "@/pages/RadarPage";
 import PredicaoPage from "@/pages/PredicaoPage";
-import EticaFlashcards from "@/pages/EticaFlashcards"; // <-- NOVA IMPORTAÇÃO
+import EticaFlashcards from "@/pages/EticaFlashcards";
+import DicionarioTeses from "@/pages/DicionarioTeses"; // <-- IMPORTAÇÃO DO DICIONÁRIO
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +28,8 @@ const App = () => (
             <Route path="/buscador" element={<BuscadorPage />} />
             <Route path="/radar" element={<RadarPage />} />
             <Route path="/predicao" element={<PredicaoPage />} />
-            <Route path="/etica" element={<EticaFlashcards />} /> {/* <-- NOVA ROTA */}
+            <Route path="/etica" element={<EticaFlashcards />} />
+            <Route path="/teses" element={<DicionarioTeses />} /> {/* <-- NOVA ROTA DE TESES */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>
