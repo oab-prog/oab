@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
-import HomePage from "@/pages/HomePage";
+import Index from "@/pages/Index"; // <-- IMPORTAMOS O NOVO INDEX AQUI
 import SimuladoPage from "@/pages/SimuladoPage";
 import BuscadorPage from "@/pages/BuscadorPage";
 import RadarPage from "@/pages/RadarPage";
@@ -18,11 +18,11 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      {/* OLHA A MUDANÇA AQUI: Trocamos o BrowserRouter pelo HashRouter */}
       <HashRouter>
         <AppLayout>
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            {/* AGORA O "/" APONTA PARA O INDEX (NOSSA DASHBOARD) */}
+            <Route path="/" element={<Index />} /> 
             <Route path="/simulado" element={<SimuladoPage />} />
             <Route path="/buscador" element={<BuscadorPage />} />
             <Route path="/radar" element={<RadarPage />} />
