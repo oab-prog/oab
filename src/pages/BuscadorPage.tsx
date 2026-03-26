@@ -28,30 +28,30 @@ export default function BuscadorPage() {
   };
 
   return (
-    <div className="p-6 md:p-10 max-w-4xl mx-auto">
+    <div className="p-4 md:p-10 max-w-4xl mx-auto space-y-6">
       <div ref={hero.ref} style={hero.style}>
-        <h1 className="text-3xl font-bold mb-1">
+        <h1 className="text-2xl md:text-3xl font-bold mb-1">
           Buscador <span className="text-gradient-gold">Estratégico</span>
         </h1>
-        <p className="text-muted-foreground text-sm mb-6">Pesquise em todo o banco de dados por tema, palavra-chave ou assunto.</p>
+        <p className="text-muted-foreground text-xs md:text-sm mb-6">Pesquise em todo o banco de dados por tema, palavra-chave ou assunto.</p>
 
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-col sm:flex-row gap-2 mb-6">
           <Input
             placeholder="Ex: Ética, Habeas Corpus, Constitucional..."
             value={termo}
             onChange={e => setTermo(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="h-11"
+            className="h-11 w-full"
           />
-          <Button onClick={buscar} className="h-11 px-6 active:scale-[0.97]">
+          <Button onClick={buscar} className="h-11 px-6 active:scale-[0.97] w-full sm:w-auto">
             <Search className="h-4 w-4 mr-2" /> Buscar
           </Button>
         </div>
       </div>
 
       {searched && (
-        <div className="flex items-center justify-between mb-4">
-          <p className={`text-sm font-medium ${resultados.length > 0 ? "text-success" : "text-destructive"}`}>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
+          <p className={`text-xs md:text-sm font-medium ${resultados.length > 0 ? "text-success" : "text-destructive"}`}>
             {resultados.length > 0
               ? `${resultados.length} questão(ões) encontrada(s) sobre "${termo}"`
               : `Nenhum resultado para "${termo}"`}
@@ -60,7 +60,7 @@ export default function BuscadorPage() {
             <Button
               variant="outline"
               size="sm"
-              className="active:scale-[0.97]"
+              className="active:scale-[0.97] w-full sm:w-auto"
               onClick={() => exportarQuestoesPDF(resultados, `Busca: "${termo}" - JurisVision`, `busca-${termo}.pdf`)}
             >
               <Download className="h-3.5 w-3.5 mr-1.5" /> Exportar PDF

@@ -4,12 +4,16 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
-import HomePage from "@/pages/HomePage";
+import Index from "@/pages/Index";
 import SimuladoPage from "@/pages/SimuladoPage";
 import BuscadorPage from "@/pages/BuscadorPage";
 import RadarPage from "@/pages/RadarPage";
 import PredicaoPage from "@/pages/PredicaoPage";
+import EticaFlashcards from "@/pages/EticaFlashcards";
+import DicionarioTeses from "@/pages/DicionarioTeses"; // <-- IMPORTAÇÃO DO DICIONÁRIO
 import NotFound from "./pages/NotFound";
+
+import { AuthGuard } from "@/components/AuthGuard";
 
 const queryClient = new QueryClient();
 
@@ -18,18 +22,21 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      {/* OLHA A MUDANÇA AQUI: Trocamos o BrowserRouter pelo HashRouter */}
       <HashRouter>
-        <AppLayout>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/simulado" element={<SimuladoPage />} />
-            <Route path="/buscador" element={<BuscadorPage />} />
-            <Route path="/radar" element={<RadarPage />} />
-            <Route path="/predicao" element={<PredicaoPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AppLayout>
+        <AuthGuard>
+          <AppLayout>
+            <Routes>
+              <Route path="/" element={<Index />} /> 
+              <Route path="/simulado" element={<SimuladoPage />} />
+              <Route path="/buscador" element={<BuscadorPage />} />
+              <Route path="/radar" element={<RadarPage />} />
+              <Route path="/predicao" element={<PredicaoPage />} />
+              <Route path="/etica" element={<EticaFlashcards />} />
+              <Route path="/teses" element={<DicionarioTeses />} /> {/* <-- NOVA ROTA DE TESES */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AppLayout>
+        </AuthGuard>
       </HashRouter>
     </TooltipProvider>
   </QueryClientProvider>

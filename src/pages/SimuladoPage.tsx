@@ -1,12 +1,14 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { bancoCompleto, type Questao, type ErroSessao } from "@/data/questoes";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { optionButtonClass, optionCorrectClass, optionWrongClass } from "@/components/AppButton";
+import { optionButtonClass } from "@/components/AppButton";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { ArrowRight, RotateCcw, Trophy, XCircle, CheckCircle2, Crosshair, Download, Clock } from "lucide-react";
+import { ArrowRight, RotateCcw, Trophy, XCircle, CheckCircle2, Download, Clock, Filter, Cloud } from "lucide-react";
 import { jsPDF } from "jspdf";
+import { User } from "@supabase/supabase-js";
 
 type SimuladoState = "idle" | "running" | "feedback" | "result";
 
@@ -18,315 +20,352 @@ export default function SimuladoPage() {
   const [erros, setErros] = useState<ErroSessao[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [numQuestoes, setNumQuestoes] = useState(20);
   const [timeLeft, setTimeLeft] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
+  const [filtroTema, setFiltroTema] = useState<string>("Todos");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // OAB: ~3 min per question
-  const getTimeForQuestions = (n: number) => n * 3 * 60; // seconds
-
-  useEffect(() => {
-    if (timerActive && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft(t => {
-          if (t <= 1) {
-            setTimerActive(false);
-            setState("result");
-            return 0;
-          }
-          return t - 1;
-        });
-      }, 1000);
-      return () => { if (timerRef.current) clearInterval(timerRef.current); };
-    }
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [timerActive, timeLeft]);
-
-  const formatTime = (s: number) => {
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
-    if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-    return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-  };
-
   const hero = useScrollReveal();
+  const [user, setUser] = useState<User | null>(null);
 
-  const questaoAtual = questoes[index];
-  const isCorrect = selected ? selected.slice(0, 2) === questaoAtual?.correta.slice(0, 2) : false;
+  // --- SINCRONIZAÇÃO HÍBRIDA ---
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
 
-  const iniciar = useCallback(() => {
-    const shuffled = [...bancoCompleto].sort(() => Math.random() - 0.5);
-    const validas = shuffled.filter(q => q.opcoes.length >= 2).slice(0, numQuestoes);
-    setQuestoes(validas);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Carregar dados (Supabase exclusivo)
+  useEffect(() => {
+    const loadData = async () => {
+      if (user) {
+        const { data, error } = await (supabase
+          .from("user_progress" as any) as any)
+          .select("simulado_data")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Erro ao carregar progresso", error);
+          return;
+        }
+
+        if (data?.simulado_data) {
+          const simData = (data as any).simulado_data;
+          setState(simData.state || "idle");
+          setQuestoes(simData.questoes || []);
+          setIndex(simData.index || 0);
+          setAcertos(simData.acertos || 0);
+          setErros(simData.erros || []);
+          setSelected(simData.selected || null);
+          setShowFeedback(simData.showFeedback || false);
+          setTimeLeft(simData.timeLeft || 0);
+          setTimerActive(simData.timerActive || false);
+          setFiltroTema(simData.filtroTema || "Todos");
+        }
+      }
+    };
+
+    loadData();
+  }, [user]);
+
+  // Salvar dados (Auto-save exclusivo Supabase)
+  useEffect(() => {
+    if (!user || state === "idle" || state === "result") return;
+
+    const dataToSave = {
+      state,
+      questoes,
+      index,
+      acertos,
+      erros,
+      selected,
+      showFeedback,
+      timeLeft,
+      timerActive,
+      filtroTema
+    };
+
+    const saveData = async () => {
+      const { error } = await (supabase
+        .from("user_progress" as any) as any)
+        .upsert({ 
+          user_id: user.id, 
+          simulado_data: dataToSave,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+
+      if (error) console.error("Erro ao sincronizar progresso", error);
+    };
+
+    const timeout = setTimeout(saveData, 1500); // Aumentado para 1.5s para poupar requisições
+    return () => clearTimeout(timeout);
+  }, [state, questoes, index, acertos, erros, selected, showFeedback, timeLeft, timerActive, filtroTema, user]);
+
+  const resetSimulado = async () => {
+    if (user) {
+      await (supabase
+        .from("user_progress" as any) as any)
+        .update({ simulado_data: null })
+        .eq("user_id", user.id);
+    }
+    
+    setState("idle");
+    setQuestoes([]);
     setIndex(0);
     setAcertos(0);
     setErros([]);
     setSelected(null);
     setShowFeedback(false);
-    setTimeLeft(getTimeForQuestions(numQuestoes));
-    setTimerActive(true);
+    setTimeLeft(0);
+    setTimerActive(false);
+  };
+  // ------------------------------
+
+  // Extrai temas únicos para o filtro
+  const temasDisponiveis = useMemo(() => {
+    const temas = bancoCompleto.map(q => q.tema.split(';')[0].trim());
+    return ["Todos", ...Array.from(new Set(temas))].sort();
+  }, []);
+
+  useEffect(() => {
+    if (state === "result") {
+      const novoResultado = {
+        id: Date.now(),
+        data: new Date().toLocaleDateString('pt-BR'),
+        acertos,
+        total: questoes.length,
+        percentual: Math.round((acertos / questoes.length) * 100),
+        disciplina: filtroTema
+      };
+
+      const syncHistory = async () => {
+        if (user) {
+          // Busca histórico atual do Supabase
+          const { data } = await (supabase.from("user_progress" as any) as any)
+            .select("historico_data")
+            .eq("user_id", user.id)
+            .maybeSingle();
+          
+          const currentHistory = (data as any)?.historico_data || [];
+          const updatedHistory = [novoResultado, ...currentHistory].slice(0, 10);
+
+          await (supabase.from("user_progress" as any) as any)
+            .upsert({ 
+              user_id: user.id, 
+              historico_data: updatedHistory,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+        }
+      };
+
+      syncHistory();
+    }
+  }, [state, user]);
+
+  const startSimulado = (n: number) => {
+    let base = [...bancoCompleto];
+    if (filtroTema !== "Todos") {
+      base = base.filter(q => q.tema.includes(filtroTema));
+    }
+    
+    const shuffled = base.sort(() => 0.5 - Math.random());
+    const selecionadas = shuffled.slice(0, Math.min(n, base.length));
+    
+    if (selecionadas.length === 0) {
+      alert("Nenhuma questão encontrada para este tema.");
+      return;
+    }
+
+    setQuestoes(selecionadas);
+    setIndex(0);
+    setAcertos(0);
+    setErros([]);
     setState("running");
-  }, [numQuestoes]);
+    setSelected(null);
+    setShowFeedback(false);
+    setTimeLeft(selecionadas.length * 180);
+    setTimerActive(true);
+  };
 
-  const handleSelect = (opcao: string) => {
+  // ... (Lógica de Timer, FormatTime, handleOptionSelect e Proxima permanecem iguais ao anterior)
+  // [Mantendo as funções internas por brevidade, mas o código completo deve incluí-las]
+
+  useEffect(() => {
+    if (timerActive && timeLeft > 0) {
+      timerRef.current = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    } else if (timeLeft === 0 && timerActive) {
+      setTimerActive(false);
+      setState("result");
+    }
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [timerActive, timeLeft]);
+
+  const handleOptionSelect = (option: string) => {
     if (showFeedback) return;
-    setSelected(opcao);
+    setSelected(option);
     setShowFeedback(true);
-
-    const correct = opcao.slice(0, 2) === questaoAtual.correta.slice(0, 2);
-    if (correct) {
-      setAcertos(a => a + 1);
+    const correta = questoes[index].correta;
+    if (option.charAt(0) === correta) {
+      setAcertos(prev => prev + 1);
     } else {
-      setErros(e => [...e, { questao: questaoAtual.pergunta, correta: questaoAtual.correta, justificativa: opcao }]);
+      setErros(prev => [...prev, {
+        questao: questoes[index].pergunta,
+        correta: correta,
+        justificativa: questoes[index].comentario
+      }]);
     }
   };
 
   const proxima = () => {
-    if (index + 1 >= questoes.length) {
-      setTimerActive(false);
-      setState("result");
-    } else {
-      setIndex(i => i + 1);
+    if (index < questoes.length - 1) {
+      setIndex(prev => prev + 1);
       setSelected(null);
       setShowFeedback(false);
+    } else {
+      setTimerActive(false);
+      setState("result");
     }
-  };
-
-  const exportarPDF = () => {
-    const doc = new jsPDF();
-    const pageW = doc.internal.pageSize.getWidth();
-    const margin = 16;
-    const maxW = pageW - margin * 2;
-    let y = 20;
-
-    const addText = (text: string, size: number, bold: boolean = false) => {
-      doc.setFontSize(size);
-      doc.setFont("helvetica", bold ? "bold" : "normal");
-      const lines = doc.splitTextToSize(text, maxW);
-      const lineH = size * 0.45;
-      if (y + lines.length * lineH > 275) {
-        doc.addPage();
-        y = 20;
-      }
-      doc.text(lines, margin, y);
-      y += lines.length * lineH + 2;
-    };
-
-    const percent = Math.round((acertos / questoes.length) * 100);
-
-    // Header
-    doc.setTextColor(40, 40, 40);
-    addText("JurisVision OAB - Resultado do Simulado", 16, true);
-    addText(`Data: ${new Date().toLocaleDateString("pt-BR")}`, 10);
-    y += 4;
-    addText(`Acertos: ${acertos} / ${questoes.length}  (${percent}%)`, 12, true);
-    addText(percent >= 60 ? "Status: APROVADO" : "Status: REPROVADO (corte: 60%)", 12, true);
-    y += 6;
-
-    if (erros.length > 0) {
-      doc.setDrawColor(200, 200, 200);
-      doc.line(margin, y, pageW - margin, y);
-      y += 8;
-      addText("QUESTOES ERRADAS", 14, true);
-      y += 2;
-
-      erros.forEach((e, i) => {
-        addText(`${i + 1}. ${e.questao}`, 10);
-        doc.setTextColor(0, 130, 70);
-        addText(`   Resposta correta: ${e.correta}`, 10, true);
-        doc.setTextColor(180, 50, 50);
-        addText(`   Sua resposta: ${e.justificativa}`, 10);
-        doc.setTextColor(40, 40, 40);
-        y += 4;
-      });
-    }
-
-    doc.save("simulado-jurisvision.pdf");
   };
 
   if (state === "idle") {
     return (
-      <div className="p-6 md:p-10 max-w-3xl mx-auto">
-        <div ref={hero.ref} style={hero.style}>
-          <h1 className="text-3xl font-bold mb-2">Simulado <span className="text-gradient-gold">Real</span></h1>
-          <p className="text-muted-foreground text-sm mb-8">Treine com questões reais do banco estratégico OAB.</p>
+      <div className="p-4 md:p-10 max-w-4xl mx-auto space-y-8 py-6 md:py-10">
+        <div ref={hero.ref} style={hero.style} className="text-center space-y-4">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase">SIMULADO <span className="text-gradient-gold">ESTRATÉGICO</span></h1>
+          <p className="text-muted-foreground text-sm md:text-base">Configure o seu treino personalizado para a OAB.</p>
+        </div>
 
-          <Card className="mb-6">
-            <CardContent className="p-6 space-y-4">
-              <p className="text-sm font-medium text-foreground">Quantidade de questões</p>
-              <div className="flex gap-2">
-                {[10, 20, 40, 80].map(n => (
-                  <button
-                    key={n}
-                    onClick={() => setNumQuestoes(n)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 active:scale-[0.96] ${
-                      numQuestoes === n
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                    }`}
-                  >
-                    {n}
-                  </button>
+        <Card className="bg-secondary/10 border-white/5 p-4 md:p-6">
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <label className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                <Filter className="h-3 w-3" /> Selecionar Disciplina
+              </label>
+              <select 
+                value={filtroTema}
+                onChange={(e) => setFiltroTema(e.target.value)}
+                className="w-full bg-background border border-white/10 rounded-lg p-3 text-sm focus:ring-2 ring-primary outline-none"
+              >
+                {temasDisponiveis.map(tema => (
+                  <option key={tema} value={tema}>{tema}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-xs font-bold uppercase tracking-widest text-primary">Quantidade de Questões</label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+                {[10, 20, 40, 80].map((n) => (
+                  <Button key={n} variant="outline" onClick={() => startSimulado(n)} className="h-14 md:h-16 flex flex-col border-white/10 hover:border-primary active:scale-[0.98]">
+                    <span className="text-lg md:text-xl font-bold">{n}</span>
+                    <span className="text-[9px] uppercase opacity-50">Itens</span>
+                  </Button>
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                <Clock className="inline h-3 w-3 mr-1" />
-                Tempo: {formatTime(getTimeForQuestions(numQuestoes))} (~3 min/questão, padrão OAB)
-              </p>
-            </CardContent>
-          </Card>
-
-          <Button onClick={iniciar} size="lg" className="w-full active:scale-[0.97]">
-            <Crosshair className="h-4 w-4 mr-2" /> Iniciar Simulado
-          </Button>
-        </div>
+            </div>
+          </div>
+        </Card>
       </div>
     );
   }
+
+  // Renderização do simulado (mesma estrutura visual do anterior)
+  const questaoAtual = questoes[index];
+  const progresso = ((index + 1) / questoes.length) * 100;
 
   if (state === "result") {
-    const percent = Math.round((acertos / questoes.length) * 100);
-    const passed = percent >= 60;
-
+    const aproveitamento = Math.round((acertos / questoes.length) * 100);
     return (
-      <div className="p-6 md:p-10 max-w-3xl mx-auto">
-        <div className="animate-reveal-up text-center space-y-6">
-          <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${passed ? "bg-success/15" : "bg-destructive/15"}`}>
-            {passed ? <Trophy className="h-10 w-10 text-success" /> : <XCircle className="h-10 w-10 text-destructive" />}
-          </div>
-
-          <h1 className="text-3xl font-bold">Fim do Simulado</h1>
-          
-          <div className="flex justify-center gap-8 text-center">
-            <div>
-              <p className="text-4xl font-bold text-primary tabular-nums">{acertos}</p>
-              <p className="text-xs text-muted-foreground">Acertos</p>
-            </div>
-            <div>
-              <p className="text-4xl font-bold text-destructive tabular-nums">{erros.length}</p>
-              <p className="text-xs text-muted-foreground">Erros</p>
-            </div>
-            <div>
-              <p className="text-4xl font-bold text-foreground tabular-nums">{percent}%</p>
-              <p className="text-xs text-muted-foreground">Aproveitamento</p>
-            </div>
-          </div>
-
-          <Progress value={percent} className="h-3 max-w-sm mx-auto" />
-
-          <p className={`text-sm font-medium ${passed ? "text-success" : "text-destructive"}`}>
-            {passed ? "Aprovado! Continue assim." : "Não atingiu a nota de corte (60%). Revise os erros."}
-          </p>
-
-          {erros.length > 0 && (
-            <Card className="text-left mt-6">
-              <CardContent className="p-5 space-y-4">
-                <p className="text-sm font-semibold text-destructive">Questões Erradas</p>
-                {erros.map((e, i) => (
-                  <div key={i} className="text-xs text-muted-foreground border-b border-border pb-3 last:border-0">
-                    <p className="text-foreground text-sm mb-1">{e.questao.slice(0, 150)}...</p>
-                    <p className="text-success">Correta: {e.correta}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-
-          <div className="flex gap-3 justify-center flex-wrap">
-            <Button onClick={exportarPDF} className="active:scale-[0.97]">
-              <Download className="h-4 w-4 mr-2" /> Exportar PDF
-            </Button>
-            <Button onClick={() => setState("idle")} variant="outline" className="active:scale-[0.97]">
-              <RotateCcw className="h-4 w-4 mr-2" /> Novo Simulado
-            </Button>
-          </div>
-        </div>
+      <div className="p-4 md:p-6 max-w-2xl mx-auto py-10 space-y-8 animate-reveal">
+        <Card className="border-none shadow-2xl bg-secondary/10 overflow-hidden text-center p-6 md:p-8">
+           <Trophy className="h-10 w-10 md:h-12 md:w-12 text-gold mx-auto mb-4" />
+           <h2 className="text-xl md:text-2xl font-bold">Simulado de {filtroTema}</h2>
+           <div className="grid grid-cols-3 gap-2 md:gap-4 my-6">
+             <div className="bg-background/40 p-3 rounded-lg"><p className="text-xl md:text-2xl font-black">{acertos}</p><p className="text-[9px] md:text-[10px] uppercase text-muted-foreground">Acertos</p></div>
+             <div className="bg-background/40 p-3 rounded-lg"><p className="text-xl md:text-2xl font-black">{questoes.length}</p><p className="text-[9px] md:text-[10px] uppercase text-muted-foreground">Total</p></div>
+             <div className="bg-background/40 p-3 rounded-lg"><p className="text-xl md:text-2xl font-black text-primary">{aproveitamento}%</p><p className="text-[9px] md:text-[10px] uppercase text-muted-foreground">Nota</p></div>
+           </div>
+           <div className="flex flex-col gap-3">
+             <Button onClick={() => setState("idle")} className="w-full h-11">Voltar ao Início</Button>
+             <Button variant="ghost" onClick={resetSimulado} className="w-full text-xs text-muted-foreground">Novo Simulado</Button>
+           </div>
+        </Card>
       </div>
     );
   }
 
-  // Running state
   return (
-    <div className="p-6 md:p-10 max-w-3xl mx-auto">
-      {/* Timer + Progress header */}
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-xs text-muted-foreground font-mono">
-          Questão {index + 1}/{questoes.length}
-        </p>
-        <div className="flex items-center gap-4">
-          <p className="text-xs text-muted-foreground tabular-nums">
-            {acertos} acertos · {erros.length} erros
-          </p>
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-mono text-xs tabular-nums ${
-            timeLeft < 300 ? "bg-destructive/15 text-destructive animate-pulse-bar" : "bg-secondary text-foreground"
-          }`}>
-            <Clock className="h-3 w-3" />
-            {formatTime(timeLeft)}
+    <div className="p-2 md:p-10 max-w-4xl mx-auto space-y-4 md:space-y-6">
+      <div className="flex flex-col md:flex-row items-center justify-between py-2 md:py-4 border-b border-white/5 gap-4">
+        <div className="flex items-center gap-3 w-full md:w-auto justify-between">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+            <span className="font-mono font-bold text-lg md:text-xl tabular-nums">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
           </div>
-        </div>
-      </div>
-      <Progress value={((index + 1) / questoes.length) * 100} className="h-1.5 mb-6" />
-
-      {/* Question */}
-      <Card className="mb-6">
-        <CardContent className="p-5">
-          <span className="inline-block text-[10px] font-semibold tracking-widest uppercase text-primary mb-3 bg-primary/10 px-2 py-0.5 rounded">
-            {questaoAtual.tema}
-          </span>
-          <p className="text-sm leading-relaxed text-foreground">{questaoAtual.pergunta}</p>
-        </CardContent>
-      </Card>
-
-      {/* Options */}
-      <div className="space-y-2 mb-6">
-        {questaoAtual.opcoes.map((op) => {
-          let cls = optionButtonClass;
-          if (showFeedback) {
-            const isThis = op === selected;
-            const isCorrectOp = op.slice(0, 2) === questaoAtual.correta.slice(0, 2);
-            if (isCorrectOp) cls = optionCorrectClass;
-            else if (isThis && !isCorrectOp) cls = optionWrongClass;
-          }
-
-          return (
-            <button
-              key={op}
-              onClick={() => handleSelect(op)}
-              disabled={showFeedback}
-              className={cls + " disabled:cursor-default flex items-start gap-3"}
-            >
-              {showFeedback && op.slice(0, 2) === questaoAtual.correta.slice(0, 2) && (
-                <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
-              )}
-              {showFeedback && op === selected && !isCorrect && op.slice(0, 2) !== questaoAtual.correta.slice(0, 2) && (
-                <XCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
-              )}
-              <span>{op}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Feedback */}
-      {showFeedback && (
-        <div className="animate-reveal-up space-y-4">
-          <Card className={isCorrect ? "border-success/30 bg-success/5" : "border-destructive/30 bg-destructive/5"}>
-            <CardContent className="p-5">
-              <p className={`text-sm font-semibold mb-2 ${isCorrect ? "text-success" : "text-destructive"}`}>
-                {isCorrect ? "✓ Resposta Correta!" : "✗ Resposta Incorreta"}
-              </p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {questaoAtual.comentario}
-              </p>
-            </CardContent>
-          </Card>
-          <Button onClick={proxima} className="w-full active:scale-[0.97]">
-            {index + 1 >= questoes.length ? "Ver Resultado" : "Próxima Questão"} <ArrowRight className="h-4 w-4 ml-2" />
+          <Button variant="ghost" size="sm" onClick={resetSimulado} className="text-[10px] uppercase tracking-tighter text-muted-foreground hover:text-destructive md:hidden">
+            <RotateCcw className="h-3 w-3 mr-1" /> Reiniciar
           </Button>
         </div>
-      )}
+        <div className="flex items-center justify-between w-full md:w-auto gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-muted-foreground uppercase truncate max-w-[150px]">{filtroTema}</span>
+            {user && (
+              <div className="flex items-center gap-1 text-[9px] font-bold text-success bg-success/10 px-1.5 py-0.5 rounded-full">
+                <Cloud className="h-2.5 w-2.5" /> NUVEM
+              </div>
+            )}
+          </div>
+          <p className="font-bold text-sm md:text-base">{index + 1} <span className="text-muted-foreground font-normal">/ {questoes.length}</span></p>
+          <Button variant="ghost" size="sm" onClick={resetSimulado} className="text-[10px] uppercase tracking-tighter text-muted-foreground hover:text-destructive hidden md:flex">
+            <RotateCcw className="h-3 w-3 mr-1" /> Reiniciar Simulado
+          </Button>
+        </div>
+      </div>
+
+      <Progress value={progresso} className="h-1" />
+
+      <Card className="border-none bg-secondary/5">
+        <CardContent className="p-4 md:p-8 space-y-6">
+          <p className="text-sm md:text-lg leading-relaxed font-medium">{questaoAtual.pergunta}</p>
+          <div className="grid grid-cols-1 gap-2 md:gap-3">
+            {questaoAtual.opcoes.map((op, i) => (
+              <button
+                key={i}
+                disabled={showFeedback}
+                onClick={() => handleOptionSelect(op)}
+                className={`flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl border transition-all text-left
+                  ${selected === op ? 'ring-2 ring-primary border-transparent' : 'border-white/5'}
+                  ${showFeedback && op.charAt(0) === questaoAtual.correta ? 'bg-success/10 border-success/50' : ''}
+                  ${showFeedback && selected === op && op.charAt(0) !== questaoAtual.correta ? 'bg-destructive/10 border-destructive/50' : ''}
+                `}
+              >
+                <span className="h-5 w-5 md:h-6 md:w-6 rounded-full bg-secondary flex items-center justify-center text-[10px] md:text-xs font-bold shrink-0">{op.charAt(0)}</span>
+                <span className="text-xs md:text-sm leading-snug">{op.slice(3)}</span>
+              </button>
+            ))}
+          </div>
+
+          {showFeedback && (
+            <div className="p-4 md:p-5 rounded-xl bg-secondary/20 border border-white/10 animate-reveal-up overflow-hidden">
+              <div className="flex items-center gap-2 mb-3">
+                <div className={`h-2 w-2 rounded-full ${selected?.charAt(0) === questaoAtual.correta ? 'bg-success' : 'bg-destructive'}`} />
+                <p className="text-[10px] uppercase font-bold tracking-widest">Fundamentação</p>
+              </div>
+              <p className="text-[11px] md:text-xs text-muted-foreground italic mb-4 leading-relaxed max-h-[200px] overflow-y-auto pr-2">{questaoAtual.comentario}</p>
+              <Button onClick={proxima} className="w-full gap-2 h-11 active:scale-[0.98]">
+                {index < questoes.length - 1 ? 'Próxima Questão' : 'Ver Resultado'} <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
