@@ -420,7 +420,7 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
           <ResizablePanel defaultSize={isFocusMode ? 100 : 60} minSize={40}>
             <div className={`h-full flex flex-col bg-background ${isFocusMode ? "max-w-4xl mx-auto shadow-2xl border-x" : ""}`}>
               <div className="px-4 py-2 border-b bg-muted/10 flex items-center justify-between shrink-0">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Editor de Peça Processual - v1.9.5</span>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Editor de Peça Processual - v1.9.6</span>
                 <div className="flex items-center gap-4">
                   <span className="text-[10px] text-muted-foreground italic hidden sm:inline">Use parágrafos claros e fundamente no Direito.</span>
                   {!isFocusMode && (

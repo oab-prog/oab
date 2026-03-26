@@ -4,10 +4,12 @@ import { bancoCompleto, bancoEstrategico, missoes } from "@/data/questoes";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Crosshair, BookOpen, BarChart3, Scale } from "lucide-react";
 import { Link } from "react-router-dom";
+import ContagemRegressiva from "@/components/ContagemRegressiva";
 
 export default function HomePage() {
   const missaoHoje = useMemo(() => missoes[Math.floor(Math.random() * missoes.length)], []);
   const hero = useScrollReveal(0);
+  const countdown = useScrollReveal(50);
   const mission = useScrollReveal(100);
   const stats = useScrollReveal(200);
   const method = useScrollReveal(300);
@@ -21,6 +23,11 @@ export default function HomePage() {
 
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8">
+      {/* Contagem Regressiva v1.9.6 */}
+      <div ref={countdown.ref} style={countdown.style}>
+        <ContagemRegressiva />
+      </div>
+
       {/* Hero */}
       <div ref={hero.ref} style={hero.style}>
         <h1 className="text-3xl md:text-4xl font-bold">
