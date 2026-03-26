@@ -89,7 +89,11 @@ export function Auth({ onToggle }: { onToggle?: () => void }) {
                   className="h-20 w-20 mx-auto object-contain mb-6 drop-shadow-sm"
                 />
                 <h2 className="text-2xl font-bold tracking-tight">Acesse sua Área Pro</h2>
-                <p className="text-sm text-muted-foreground">Bem-vindo à sua jornada de aprovação.</p>
+                <div className="bg-slate-900 p-4 rounded-xl border border-white/10 shadow-2xl my-6">
+                  <h3 className="text-sm md:text-base font-black text-white text-center uppercase tracking-tight leading-tight">
+                    ENTRE EM CONTATO AGORA E DESCUBRA O SEGREDO DA APROVAÇÃO NA OAB GUIADA POR DADOS!
+                  </h3>
+                </div>
               </div>
 
               <Card className="border-none shadow-none bg-transparent">
@@ -181,7 +185,7 @@ export function Auth({ onToggle }: { onToggle?: () => void }) {
           </div>
 
           <div className="flex flex-col items-center md:items-end gap-2">
-            <p className="text-sm font-medium">Contato Dra. Adriana:</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Suporte Especializado:</p>
             <a href="mailto:themis.ma.consultoria@gmail.com" className="text-primary hover:underline text-sm font-bold">
               themis.ma.consultoria@gmail.com
             </a>
