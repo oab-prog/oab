@@ -194,20 +194,21 @@ const RadarRecorrenciaPage = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <div className="h-[350px] w-full">
+                  <div className="h-[500px] w-full">
                     <ChartContainer config={{
                       value: { label: "Recorrência (%)", color: "#FFFFFF" }
                     }}>
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data.pecas} margin={{ top: 20, right: 30, left: 40, bottom: 20 }} layout="vertical">
-                          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#333" />
+                        <BarChart data={data.pecas} margin={{ top: 20, right: 60, left: 40, bottom: 20 }} layout="vertical">
+                          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#444" />
                           <XAxis type="number" hide />
                           <YAxis 
                             dataKey="name" 
                             type="category" 
                             scale="band" 
-                            width={150}
-                            style={{ fontSize: '12px', fontWeight: 'bold', fill: '#FFFFFF' }}
+                            width={160}
+                            tick={{ fill: '#FFFFFF' }}
+                            style={{ fontSize: '13px', fontWeight: 'bold' }}
                           />
                           <ChartTooltip content={<ChartTooltipContent className="bg-zinc-900 border-zinc-800 text-white" />} />
                           <Bar dataKey="value" radius={[0, 4, 4, 0]}>
@@ -221,7 +222,7 @@ const RadarRecorrenciaPage = () => {
                               dataKey="value" 
                               position="right" 
                               formatter={(v: number) => `${v}%`} 
-                              style={{ fontSize: '12px', fontWeight: 'bold', fill: '#FFFFFF' }} 
+                              style={{ fontSize: '13px', fontWeight: 'bold', fill: '#FFFFFF' }} 
                             />
                           </Bar>
                         </BarChart>

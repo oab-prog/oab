@@ -1,4 +1,4 @@
-import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles, BookMarked, PenTool, Lock, Clock, Bone, Edit3, Layers } from "lucide-react";
+import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles, BookMarked, PenTool, Lock, Clock, Bone, Edit3, Layers, Brain } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useProfile } from "@/hooks/use-profile";
@@ -27,12 +27,12 @@ const items2aFase = [
   { title: "✍️ Treino de Discursivas", url: "/treino-discursivas", icon: Edit3 },
   { title: "🔎 Buscador de Espelhos FGV", url: "/buscador-espelhos", icon: Search },
   { title: "🦴 Construtor de Esqueletos", url: "/bone", icon: Bone },
-  { title: "📚 Dicionário de Teses", url: "/teses", icon: BookMarked },
 ];
 
-const itemsRecursosGerais = [
+const itemsCentralInteligencia = [
   { title: "📊 Radar de Recorrência", url: "/radar-recorrencia", icon: BarChart3 },
   { title: "⏱️ Calculadora de Prazos", url: "/calculadora-prazos", icon: Clock },
+  { title: "📚 Dicionário de Teses", url: "/teses", icon: BookMarked },
   { title: "📖 Vade Mecum Online", url: "https://www4.planalto.gov.br/legislacao/", icon: BookOpen, external: true },
 ];
 
@@ -156,10 +156,14 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel className="px-3 text-[10px] font-bold tracking-wider text-zinc-500 mb-2">CENTRAL DE INTELIGÊNCIA</SidebarGroupLabel>}
+          {!collapsed && (
+            <SidebarGroupLabel className="px-3 text-[10px] font-bold tracking-wider text-zinc-500 mb-2 flex items-center gap-2">
+              <Brain className="h-3 w-3" /> CENTRAL DE INTELIGÊNCIA
+            </SidebarGroupLabel>
+          )}
           <SidebarGroupContent>
             <SidebarMenu>
-              {itemsRecursosGerais.map((item) => (
+              {itemsCentralInteligencia.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     {item.external ? (

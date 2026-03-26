@@ -24,16 +24,12 @@ const HOLIDAYS_2026 = [
 ];
 
 const PIECE_TYPES = [
-  { label: "Apelação (15 dias)", value: "15", area: "Cível/Penal" },
-  { label: "Agravo de Instrumento (15 dias)", value: "15", area: "Cível" },
-  { label: "Recurso Especial (15 dias)", value: "15", area: "Cível" },
-  { label: "Recurso Extraordinário (15 dias)", value: "15", area: "Cível" },
+  { label: "Prazos Gerais (15 dias)", value: "15", area: "CPC - Art. 1.003" },
+  { label: "Recursos Trabalhistas (8 dias)", value: "8", area: "CLT - Art. 895" },
   { label: "Embargos de Declaração (5 dias)", value: "5", area: "Geral" },
-  { label: "Recurso Ordinário - ROC (8 dias)", value: "8", area: "Trabalho" },
-  { label: "Agravo de Instrumento (8 dias)", value: "8", area: "Trabalho" },
-  { label: "Recurso de Revista (8 dias)", value: "8", area: "Trabalho" },
+  { label: "Agravo de Instrumento (15 dias)", value: "15", area: "Cível" },
   { label: "Contestação (15 dias)", value: "15", area: "Cível" },
-  { label: "Réplica (15 dias)", value: "15", area: "Cível" },
+  { label: "Recurso Ordinário (8 dias)", value: "8", area: "Trabalho" },
 ];
 
 const CalculadoraPrazosPage = () => {
@@ -67,6 +63,7 @@ const CalculadoraPrazosPage = () => {
     // A contagem começa no primeiro dia útil APÓS a intimação (Art. 224 CPC)
     // "Exclui-se o dia do começo e inclui-se o dia do vencimento"
     
+    // Pula para o próximo dia (exclusão do dia do começo)
     currentDate = addDays(currentDate, 1);
     
     // Se o dia de início da contagem não for útil, pula para o próximo útil
@@ -74,7 +71,8 @@ const CalculadoraPrazosPage = () => {
       currentDate = addDays(currentDate, 1);
     }
 
-    while (daysAdded < (days - 1)) { // Já estamos no primeiro dia útil
+    // Já contamos o primeiro dia útil se chegamos aqui
+    while (daysAdded < (days - 1)) {
       currentDate = addDays(currentDate, 1);
       if (!isHolidayOrWeekendOrRecess(currentDate)) {
         daysAdded++;
@@ -105,7 +103,7 @@ const CalculadoraPrazosPage = () => {
         </div>
         <div className="flex items-center gap-2 bg-blue-500/10 px-4 py-2 rounded-full border border-blue-500/20">
            <Scale className="h-4 w-4 text-blue-400" />
-           <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">v1.7.0 | OAB-FGV Compliance</span>
+           <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">v1.8.0 | Smart Brain Edition</span>
         </div>
       </div>
 
