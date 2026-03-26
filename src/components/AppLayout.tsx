@@ -70,10 +70,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             {children}
           </main>
 
-          {/* Rodapé institucional da SoftGestão */}
+          {/* Rodapé institucional da Adriana Sousa Tech */}
           <footer className="border-t border-border py-4 px-6 bg-background/50 text-center text-[10px] text-muted-foreground shrink-0 space-y-1 relative">
-            <p>© 2026 SoftGestão – Todos os direitos reservados – Themis M.A. Consultoria Forense By Adriana Sousa</p>
-            <p className="opacity-50 uppercase tracking-widest font-semibold">JurisVision v1.9.4 — Arsenal 2ª Fase — Oficial</p>
+            <p>© 2026 Adriana Sousa Tech – Todos os direitos reservados</p>
+            <p className="opacity-50 uppercase tracking-widest font-semibold">JurisVision v2.0.0 — Versão Oficial by Adriana Sousa Tech</p>
             
             <a
               href="https://wa.me/5511978353047?text=Olá, gostaria de saber mais sobre o JurisVision 2ª Fase!"

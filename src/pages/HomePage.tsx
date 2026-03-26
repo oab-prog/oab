@@ -23,7 +23,7 @@ export default function HomePage() {
 
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8">
-      {/* Contagem Regressiva v1.9.6 */}
+      {/* Contagem Regressiva v2.0.0 */}
       <div ref={countdown.ref} style={countdown.style}>
         <ContagemRegressiva />
       </div>

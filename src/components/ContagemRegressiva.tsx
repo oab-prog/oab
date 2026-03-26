@@ -6,9 +6,33 @@ export default function ContagemRegressiva() {
   const [tempo1, setTempo1] = useState({ dias: 0, horas: 0, min: 0, seg: 0 });
   const [tempo2, setTempo2] = useState({ dias: 0, horas: 0, min: 0, seg: 0 });
 
-  // Datas Oficiais (2026)
-  const data1aFase = useMemo(() => new Date(2026, 4, 17, 13, 0).getTime(), []); 
-  const data2aFase = useMemo(() => new Date(2026, 6, 5, 13, 0).getTime(), []); 
+  // Banco de Datas Oficial OAB 2026
+  const EXAMES = [
+    {
+      nome: "46º Exame",
+      fase1: new Date(2026, 4, 3, 13, 0).getTime(), // 03/05/2026
+      fase2: new Date(2026, 5, 21, 13, 0).getTime(), // 21/06/2026
+    },
+    {
+      nome: "47º Exame",
+      fase1: new Date(2026, 7, 30, 13, 0).getTime(), // 30/08/2026
+      fase2: new Date(2026, 9, 18, 13, 0).getTime(), // 18/10/2026
+    },
+    {
+      nome: "48º Exame",
+      fase1: new Date(2026, 11, 20, 13, 0).getTime(), // 20/12/2026
+      fase2: new Date(2027, 1, 21, 13, 0).getTime(), // 21/02/2027
+    }
+  ];
+
+  const exameAtual = useMemo(() => {
+    const agora = new Date().getTime();
+    // Encontrar o primeiro exame onde a 2ª fase ainda não passou
+    return EXAMES.find(exame => exame.fase2 > agora) || EXAMES[EXAMES.length - 1];
+  }, []);
+
+  const data1aFase = exameAtual.fase1;
+  const data2aFase = exameAtual.fase2;
 
   const calculateTimeLeft = (targetDate: number) => {
     const agora = new Date().getTime();
@@ -49,7 +73,7 @@ export default function ContagemRegressiva() {
                   Contagem 1ª Fase OAB
                 </p>
                 <p className="text-sm font-bold text-foreground">
-                  46º Exame (17/05/2026)
+                  {exameAtual.nome} ({new Date(exameAtual.fase1).toLocaleDateString('pt-BR')})
                 </p>
               </div>
             </div>
@@ -93,7 +117,7 @@ export default function ContagemRegressiva() {
                   Contagem 2ª Fase OAB
                 </p>
                 <p className="text-sm font-bold text-foreground">
-                  46º Exame (05/07/2026)
+                  {exameAtual.nome} ({new Date(exameAtual.fase2).toLocaleDateString('pt-BR')})
                 </p>
               </div>
             </div>

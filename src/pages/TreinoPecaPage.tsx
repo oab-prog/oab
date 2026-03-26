@@ -455,7 +455,7 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
             <TabsContent value="editor" className="flex-1 overflow-hidden m-0 p-0">
               <div className="h-full flex flex-col bg-background">
                 <div className="px-4 py-2 border-b bg-muted/10 flex items-center justify-between shrink-0">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">v1.9.8 | Moble Optimized</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">v2.0.0 | Mobile Optimized</span>
                   <div className="flex items-center gap-4">
                     <span className="text-[10px] text-muted-foreground italic">Foco total na escrita.</span>
                   </div>
@@ -525,7 +525,7 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
             <ResizablePanel defaultSize={isFocusMode ? 100 : 60} minSize={40}>
               <div className={`h-full flex flex-col bg-background ${isFocusMode ? "max-w-4xl mx-auto shadow-2xl border-x" : ""}`}>
                 <div className="px-4 py-2 border-b bg-muted/10 flex items-center justify-between shrink-0">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Editor de Peça Processual - v1.9.8</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Editor de Peça Processual - v2.0.0</span>
                   <div className="flex items-center gap-4">
                     <span className="text-[10px] text-muted-foreground italic hidden sm:inline">Use parágrafos claros e fundamente no Direito.</span>
                     {!isFocusMode && (
@@ -543,15 +543,23 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
                     onChange={(e) => setTextoAluno(e.target.value)}
                   />
                   
-                  {/* FOOTER DO EDITOR: CONTADOR v1.9.8 */}
-                  <div className="p-3 border-t-2 border-primary/20 bg-[#09090b] flex items-center justify-between shrink-0">
-                    <div className={`flex items-center gap-2 text-xs font-bold transition-colors ${linhasCount > 150 ? "text-destructive animate-pulse" : "text-muted-foreground"}`}>
-                      <AlertTriangle className={`h-3.5 w-3.5 ${linhasCount > 150 ? "opacity-100" : "opacity-0"}`} />
-                      LINHA: {linhasCount} / 150
-                      {linhasCount > 150 && <span className="ml-1 uppercase">(Limite OAB Excedido)</span>}
+                  {/* FOOTER DO EDITOR: CONTADOR v2.0.0 */}
+                  <div className="p-3 border-t-2 border-primary/20 bg-zinc-900 flex flex-col sm:flex-row items-center justify-between shrink-0 gap-3">
+                    <div className="flex items-center gap-4">
+                      <div className={`flex items-center gap-2 text-xs font-bold transition-colors ${linhasCount > 150 ? "text-destructive animate-pulse" : "text-zinc-400"}`}>
+                        <AlertTriangle className={`h-3.5 w-3.5 ${linhasCount > 150 ? "opacity-100" : "opacity-0"}`} />
+                        LINHA: {linhasCount} / 150
+                      </div>
+                      <Button 
+                        onClick={handleExportPDF}
+                        size="sm"
+                        className="bg-zinc-800 hover:bg-zinc-700 text-amber-500 border border-amber-500/30 font-bold gap-2"
+                      >
+                        <Download className="h-4 w-4" /> GERAR PDF DA PEÇA
+                      </Button>
                     </div>
-                    <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
-                      Salvamento automático ativo
+                    <div className="text-[10px] text-zinc-500 font-medium uppercase tracking-widest">
+                      JurisVision v2.0.0 — Oficial
                     </div>
                   </div>
                 </div>
