@@ -1,4 +1,4 @@
-import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles, BookMarked } from "lucide-react";
+import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles, BookMarked, PenTool } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -16,6 +16,7 @@ const items = [
   { title: "Início", url: "/", icon: Home },
   { title: "Simulado Real", url: "/simulado", icon: Crosshair },
   { title: "Dominando Ética", url: "/etica", icon: Sparkles },
+  { title: "Treino 2ª Fase", url: "/treino-peca", icon: PenTool }, // <-- NOVO MÓDULO
   { title: "Buscador", url: "/buscador", icon: Search },
   { title: "Radar de Recorrência", url: "/radar", icon: BarChart3 },
   { title: "Dicionário de Teses", url: "/teses", icon: BookMarked }, // <-- O NOVO GOOGLE JURÍDICO
@@ -42,10 +43,10 @@ export function AppSidebar() {
               />
               <div>
                 <h2 className="text-sm font-bold text-foreground tracking-tight leading-none mb-1">
-                  JurisVision OAB
+                  JurisVision 1ª Fase
                 </h2>
                 <p className="text-[9px] text-muted-foreground tracking-widest uppercase font-medium">
-                  By SoftGestão
+                  Themis M.A. Consultoria Forense
                 </p>
               </div>
             </div>
@@ -84,6 +85,7 @@ export function AppSidebar() {
                       >
                         <item.icon className={`h-4 w-4 shrink-0 
                           ${item.title === "Dominando Ética" && location.pathname !== "/etica" ? "text-gold/70" : ""}
+                          ${item.title === "Treino 2ª Fase" && location.pathname !== "/treino-peca" ? "text-primary/70" : ""}
                           ${item.title === "Dicionário de Teses" && location.pathname !== "/teses" ? "text-primary/70" : ""}
                         `} />
                         {!collapsed && <span className="text-sm">{item.title}</span>}

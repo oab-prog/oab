@@ -51,7 +51,7 @@ export function Auth({ onToggle }: { onToggle?: () => void }) {
                 <Zap className="h-3 w-3" /> Inteligência Forense
               </div>
               <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-                JurisVision: Sua Aprovação na OAB <span className="text-primary">Guiada por Dados</span>
+                JurisVision 1ª Fase: Sua Aprovação na OAB <span className="text-primary">Guiada por Dados</span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed">
                 Use o poder do nosso Radar de Recorrência para estudar o que realmente cai. Tecnologia forense a serviço da sua carteira da Ordem.
@@ -198,7 +198,7 @@ export function Auth({ onToggle }: { onToggle?: () => void }) {
               themis.ma.consultoria@gmail.com
             </a>
             <p className="text-[10px] text-muted-foreground mt-4 opacity-50 font-bold uppercase tracking-widest">
-              v1.2.2 — OFICIAL
+              v1.3.0 — OFICIAL
             </p>
           </div>
         </div>
