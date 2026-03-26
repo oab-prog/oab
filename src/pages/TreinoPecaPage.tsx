@@ -432,14 +432,14 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
               </div>
               <div className="flex-1 relative flex flex-col overflow-hidden">
                 <Textarea
-                  className={`flex-1 resize-none border-none focus-visible:ring-0 p-8 md:p-12 font-serif text-lg leading-loose bg-white/50`}
+                  className={`flex-1 resize-none border-none focus-visible:ring-0 p-8 md:p-12 font-serif text-lg leading-loose bg-[#09090b] text-[#FFFFFF] placeholder:text-[#FFFFFF]/50`}
                   placeholder="Comece a redigir sua peça aqui... Ex: EXCELENTÍSSIMO SENHOR DOUTOR JUIZ..."
                   value={textoAluno}
                   onChange={(e) => setTextoAluno(e.target.value)}
                 />
                 
                 {/* FOOTER DO EDITOR: CONTADOR v1.9.5 */}
-                <div className="p-3 border-t bg-muted/5 flex items-center justify-between shrink-0">
+                <div className="p-3 border-t-2 border-primary/20 bg-[#09090b] flex items-center justify-between shrink-0">
                   <div className={`flex items-center gap-2 text-xs font-bold transition-colors ${linhasCount > 150 ? "text-destructive animate-pulse" : "text-muted-foreground"}`}>
                     <AlertTriangle className={`h-3.5 w-3.5 ${linhasCount > 150 ? "opacity-100" : "opacity-0"}`} />
                     LINHA: {linhasCount} / 150

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Auth } from "@/components/Auth";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { User, LogOut, Cloud } from "lucide-react";
+import { User, LogOut, Cloud, MessageCircle } from "lucide-react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -71,9 +71,22 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </main>
 
           {/* Rodapé institucional da SoftGestão */}
-          <footer className="border-t border-border py-4 px-6 bg-background/50 text-center text-[10px] text-muted-foreground shrink-0 space-y-1">
+          <footer className="border-t border-border py-4 px-6 bg-background/50 text-center text-[10px] text-muted-foreground shrink-0 space-y-1 relative">
             <p>© 2026 SoftGestão – Todos os direitos reservados – Themis M.A. Consultoria Forense By Adriana Sousa</p>
             <p className="opacity-50 uppercase tracking-widest font-semibold">JurisVision v1.9.4 — Arsenal 2ª Fase — Oficial</p>
+            
+            <a
+              href="https://wa.me/5511978353047?text=Olá, gostaria de saber mais sobre o JurisVision 2ª Fase!"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute right-4 bottom-2 bg-[#25D366] text-white p-2.5 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center group"
+              aria-label="Contato WhatsApp"
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span className="absolute right-full mr-3 bg-white text-black text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg pointer-events-none">
+                Suporte WhatsApp
+              </span>
+            </a>
           </footer>
         </div>
       </div>
