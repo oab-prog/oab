@@ -1,78 +1,134 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Timer, AlertCircle } from "lucide-react";
+import { Timer, AlertCircle, Calendar } from "lucide-react";
 
 export default function ContagemRegressiva() {
-  const [tempo, setTempo] = useState({ dias: 0, horas: 0, min: 0, seg: 0 });
+  const [tempo1, setTempo1] = useState({ dias: 0, horas: 0, min: 0, seg: 0 });
+  const [tempo2, setTempo2] = useState({ dias: 0, horas: 0, min: 0, seg: 0 });
 
-  // CORREÇÃO: DATA OFICIAL DO 46º EXAME DE ORDEM (1ª FASE)
-  const dataProva = new Date("2026-05-03T09:00:00").getTime();
+  // Datas Simuladas (1 mês e 2 meses à frente conforme solicitado)
+  const data1aFase = useMemo(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
+    return d.getTime();
+  }, []);
+
+  const data2aFase = useMemo(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 2);
+    return d.getTime();
+  }, []);
+
+  const calculateTimeLeft = (targetDate: number) => {
+    const agora = new Date().getTime();
+    const diff = targetDate - agora;
+
+    if (diff > 0) {
+      return {
+        dias: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        horas: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        min: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+        seg: Math.floor((diff % (1000 * 60)) / 1000),
+      };
+    }
+    return { dias: 0, horas: 0, min: 0, seg: 0 };
+  };
 
   useEffect(() => {
     const intervalo = setInterval(() => {
-      const agora = new Date().getTime();
-      const diff = dataProva - agora;
-
-      if (diff > 0) {
-        setTempo({
-          dias: Math.floor(diff / (1000 * 60 * 60 * 24)),
-          horas: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          min: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-          seg: Math.floor((diff % (1000 * 60)) / 1000),
-        });
-      } else {
-        setTempo({ dias: 0, horas: 0, min: 0, seg: 0 });
-      }
+      setTempo1(calculateTimeLeft(data1aFase));
+      setTempo2(calculateTimeLeft(data2aFase));
     }, 1000);
 
     return () => clearInterval(intervalo);
-  }, [dataProva]);
+  }, [data1aFase, data2aFase]);
 
   return (
-    <Card className="bg-gradient-to-r from-destructive/20 to-transparent border-destructive/30 overflow-hidden shadow-lg border-l-4">
-      <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <div className="bg-destructive/20 p-2.5 rounded-xl">
-            <Timer className="h-6 w-6 text-destructive animate-pulse" />
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-destructive/80">
-              Contagem Regressiva Final
-            </p>
-            <p className="text-sm font-bold text-foreground">
-              46º Exame de Ordem Unificado
-            </p>
-          </div>
-        </div>
-
-        <div className="flex gap-4 text-center">
-          {[
-            { label: "Dias", val: tempo.dias },
-            { label: "Hrs", val: tempo.horas },
-            { label: "Min", val: tempo.min },
-            { label: "Seg", val: tempo.seg },
-          ].map((item, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <div className="bg-secondary/30 rounded-lg px-3 py-2 min-w-[55px] border border-white/5">
-                <p className="text-2xl font-black text-foreground tabular-nums leading-none">
-                  {String(item.val).padStart(2, '0')}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* CARD 1ª FASE */}
+      <Card className="bg-gradient-to-r from-destructive/20 to-transparent border-destructive/30 overflow-hidden shadow-lg border-l-4 border-l-destructive">
+        <CardContent className="p-4 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-destructive/20 p-2 rounded-xl">
+                <Timer className="h-5 w-5 text-destructive animate-pulse" />
+              </div>
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-destructive/80 leading-none mb-1">
+                  Contagem 1ª Fase OAB
+                </p>
+                <p className="text-sm font-bold text-foreground">
+                  46º Exame Unificado
                 </p>
               </div>
-              <p className="text-[9px] uppercase font-bold text-muted-foreground mt-2 tracking-tighter">
-                {item.label}
-              </p>
             </div>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2 bg-destructive/10 px-4 py-2 rounded-lg border border-destructive/20">
-          <AlertCircle className="h-4 w-4 text-destructive" />
-          <div className="text-left">
-            <p className="text-[10px] font-black text-destructive uppercase leading-none">Status: Crítico</p>
-            <p className="text-[9px] text-muted-foreground mt-1">Foco total em questões</p>
+            <div className="flex items-center gap-1.5 bg-destructive/10 px-2 py-1 rounded text-[9px] font-bold text-destructive border border-destructive/20">
+              <AlertCircle className="h-3 w-3" /> CRÍTICO
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+
+          <div className="flex justify-around items-center">
+            {[
+              { label: "Dias", val: tempo1.dias },
+              { label: "Hrs", val: tempo1.horas },
+              { label: "Min", val: tempo1.min },
+              { label: "Seg", val: tempo1.seg },
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className="bg-secondary/30 rounded-lg px-2.5 py-1.5 min-w-[50px] border border-white/5 text-center">
+                  <p className="text-xl font-black text-foreground tabular-nums leading-none">
+                    {String(item.val).padStart(2, '0')}
+                  </p>
+                </div>
+                <p className="text-[8px] uppercase font-bold text-muted-foreground mt-1.5">
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* CARD 2ª FASE */}
+      <Card className="bg-gradient-to-r from-primary/20 to-transparent border-primary/30 overflow-hidden shadow-lg border-l-4 border-l-primary">
+        <CardContent className="p-4 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/20 p-2 rounded-xl">
+                <Calendar className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-primary/80 leading-none mb-1">
+                  Contagem 2ª Fase OAB
+                </p>
+                <p className="text-sm font-bold text-foreground">
+                  Data a definir (Simulada)
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-around items-center">
+            {[
+              { label: "Dias", val: tempo2.dias },
+              { label: "Hrs", val: tempo2.horas },
+              { label: "Min", val: tempo2.min },
+              { label: "Seg", val: tempo2.seg },
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className="bg-secondary/30 rounded-lg px-2.5 py-1.5 min-w-[50px] border border-white/5 text-center">
+                  <p className="text-xl font-black text-foreground tabular-nums leading-none">
+                    {String(item.val).padStart(2, '0')}
+                  </p>
+                </div>
+                <p className="text-[8px] uppercase font-bold text-muted-foreground mt-1.5">
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

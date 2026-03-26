@@ -1,4 +1,4 @@
-import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles, BookMarked, PenTool, Lock, Clock, Bone, Edit3 } from "lucide-react";
+import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles, BookMarked, PenTool, Lock, Clock, Bone, Edit3, Layers } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useProfile } from "@/hooks/use-profile";
@@ -8,14 +8,22 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const items = [
-  { title: "Início", url: "/", icon: Home },
+const items1aFase = [
+  { title: "Radar de Recorrência", url: "/radar", icon: BarChart3 },
+  { title: "Simulado Real", url: "/simulado", icon: Crosshair },
+  { title: "Flashcards", url: "/etica", icon: Layers },
+  { title: "Buscador de Questões", url: "/buscador", icon: Search },
+  { title: "Dominando Ética", url: "/etica", icon: Scale },
+];
+
+const items2aFase = [
   { title: "Treino de Peças", url: "/treino-peca", icon: PenTool },
   { title: "Treino de Discursivas", url: "/treino-discursivas", icon: Edit3 },
   { title: "Buscador de Espelhos FGV", url: "/buscador-espelhos", icon: Search },
@@ -23,8 +31,6 @@ const items = [
   { title: "Calculadora de Prazos", url: "/calculadora-prazos", icon: Clock },
   { title: "Dicionário de Teses", url: "/teses", icon: BookMarked },
   { title: "Vade Mecum Online", url: "https://www4.planalto.gov.br/legislacao/", icon: BookOpen, external: true },
-  { title: "Radar de Recorrência", url: "/radar", icon: BarChart3, exclusive1aFase: true },
-  { title: "Simulado Real", url: "/simulado", icon: Crosshair, exclusive1aFase: true },
 ];
 
 export function AppSidebar() {
@@ -32,6 +38,7 @@ export function AppSidebar() {
   const { profile } = useProfile();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const isAssinante2aFase = profile?.assinante_2_fase === true;
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-sidebar">
@@ -65,9 +72,53 @@ export function AppSidebar() {
         </div>
 
         <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <NavLink
+                  to="/"
+                  end
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
+                  activeClassName="bg-primary/10 text-primary font-bold border-l-2 border-primary rounded-l-none"
+                >
+                  <Home className={`h-4 w-4 shrink-0 ${location.pathname === "/" ? "text-primary" : "text-muted-foreground/70"}`} />
+                  {!collapsed && <span className="text-sm">Início</span>}
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          {!collapsed && <SidebarGroupLabel className="px-3 text-[10px] font-bold tracking-wider text-muted-foreground mb-2">JURISVISION 1ª FASE</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {items1aFase.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
+                      activeClassName="bg-primary/10 text-primary font-bold border-l-2 border-primary rounded-l-none"
+                    >
+                      <item.icon className={`h-4 w-4 shrink-0 
+                        ${location.pathname === item.url ? "text-primary" : "text-muted-foreground/70"}
+                        ${item.title === "Dominando Ética" ? "text-gold" : ""}
+                      `} />
+                      {!collapsed && <span className="text-sm">{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          {!collapsed && <SidebarGroupLabel className="px-3 text-[10px] font-bold tracking-wider text-muted-foreground mb-2">JURISVISION 2ª FASE</SidebarGroupLabel>}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items2aFase.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     {item.external ? (
@@ -77,15 +128,29 @@ export function AppSidebar() {
                         rel="noopener noreferrer"
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
                       >
-                        <item.icon className={`h-4 w-4 shrink-0 ${item.title === "Dominando Ética" ? "text-gold" : ""}`} />
-                        {!collapsed && <span className="text-sm">{item.title}</span>}
+                        <item.icon className="h-4 w-4 shrink-0 text-muted-foreground/70" />
+                        {!collapsed && (
+                          <div className="flex items-center justify-between w-full gap-2">
+                            <span className="text-sm">{item.title}</span>
+                            {!isAssinante2aFase && (
+                              <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-muted/50 text-muted-foreground border-none whitespace-nowrap">
+                                🔒 Exclusivo
+                              </Badge>
+                            )}
+                          </div>
+                        )}
                       </a>
                     ) : (
                       <NavLink
-                        to={item.url}
-                        end={item.url === "/"}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
+                        to={isAssinante2aFase ? item.url : "#"}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 ${!isAssinante2aFase ? "opacity-70 cursor-not-allowed" : ""}`}
                         activeClassName="bg-primary/10 text-primary font-bold border-l-2 border-primary rounded-l-none"
+                        onClick={(e) => {
+                          if (!isAssinante2aFase) {
+                            e.preventDefault();
+                            // Optional: show toast or redirect
+                          }
+                        }}
                       >
                         <item.icon className={`h-4 w-4 shrink-0 
                           ${location.pathname === item.url ? "text-primary" : "text-muted-foreground/70"}
@@ -93,9 +158,9 @@ export function AppSidebar() {
                         {!collapsed && (
                           <div className="flex items-center justify-between w-full gap-2">
                             <span className="text-sm truncate">{item.title}</span>
-                            {item.exclusive1aFase && (
+                            {!isAssinante2aFase && (
                               <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-muted/50 text-muted-foreground border-none whitespace-nowrap">
-                                🔒 Exclusivo 1ª Fase
+                                🔒 Exclusivo
                               </Badge>
                             )}
                           </div>
