@@ -9,9 +9,6 @@ import { exportarQuestoesPDF } from "@/lib/pdf-export";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function RadarPage() {
-  // Verificação de renderização duplicada solicitada
-  console.log('--- RENDERIZANDO RADAR PAGE --- v1.0.5');
-  
   const hero = useScrollReveal();
   const chart = useScrollReveal(100);
   const clones = useScrollReveal(200);
@@ -43,12 +40,6 @@ export default function RadarPage() {
     });
     return dupes;
   }, []);
-
-  useEffect(() => {
-    // Alerta de debug solicitado para mobile - confirmação de carregamento da versão nova
-    console.log('Efeito de montagem Radar executado');
-    alert(`Radar v1.0.5\nClones Detectados: ${clonesDetectados.length}\nModo Mobile: ${isMobile ? 'SIM' : 'NÃO'}`);
-  }, [clonesDetectados.length, isMobile]);
 
   const barColors = ["hsl(38, 92%, 50%)", "hsl(38, 80%, 55%)", "hsl(38, 70%, 60%)", "hsl(220, 14%, 35%)", "hsl(220, 14%, 30%)", "hsl(220, 14%, 28%)", "hsl(220, 14%, 25%)"];
 

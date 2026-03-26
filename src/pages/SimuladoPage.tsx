@@ -9,6 +9,7 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { ArrowRight, RotateCcw, Trophy, XCircle, CheckCircle2, Download, Clock, Filter, Cloud } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { User } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast";
 
 type SimuladoState = "idle" | "running" | "feedback" | "result";
 
@@ -27,6 +28,7 @@ export default function SimuladoPage() {
 
   const hero = useScrollReveal();
   const [user, setUser] = useState<User | null>(null);
+  const { toast } = useToast();
 
   // --- SINCRONIZAÇÃO HÍBRIDA ---
   useEffect(() => {
@@ -179,7 +181,11 @@ export default function SimuladoPage() {
     const selecionadas = shuffled.slice(0, Math.min(n, base.length));
     
     if (selecionadas.length === 0) {
-      alert("Nenhuma questão encontrada para este tema.");
+      toast({
+        title: "Nenhuma questão encontrada",
+        description: `Não encontramos questões para o tema ${filtroTema}.`,
+        variant: "destructive",
+      });
       return;
     }
 
