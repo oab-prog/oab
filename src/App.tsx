@@ -68,7 +68,7 @@ const App = () => (
                   <Route path="/treino-discursivas" element={<SecondPhaseGuard><TreinoDiscursivasPage /></SecondPhaseGuard>} />
                   <Route path="/buscador-espelhos" element={<SecondPhaseGuard><BuscadorEspelhosPage /></SecondPhaseGuard>} />
                   <Route path="/construtor-esqueletos" element={<SecondPhaseGuard><ConstrutorEsqueletosPage /></SecondPhaseGuard>} />
-                  <Route path="/calculadora-prazos" element={<SecondPhaseGuard><CalculadoraPrazosPage /></SecondPhaseGuard>} />
+                  <Route path="/calculadora-prazos" element={<CalculadoraPrazosPage />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </AppLayout>

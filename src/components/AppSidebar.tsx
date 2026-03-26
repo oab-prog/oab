@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/sidebar";
 
 const items1aFase = [
-  { title: "📊 Radar de Recorrência", url: "/radar-recorrencia", icon: BarChart3 },
   { title: "📝 Simulado Real", url: "/simulado", icon: Crosshair },
   { title: "🗂️ Flashcards", url: "/etica", icon: Layers },
   { title: "🔎 Buscador de Questões", url: "/buscador", icon: Search },
@@ -27,9 +26,13 @@ const items2aFase = [
   { title: "✒️ Treino de Peças", url: "/treino-peca", icon: PenTool },
   { title: "✍️ Treino de Discursivas", url: "/treino-discursivas", icon: Edit3 },
   { title: "🔎 Buscador de Espelhos FGV", url: "/buscador-espelhos", icon: Search },
-  { title: "🦴 Construtor de Esqueletos", url: "/construtor-esqueletos", icon: Bone },
-  { title: "⏱️ Calculadora de Prazos", url: "/calculadora-prazos", icon: Clock },
+  { title: "🦴 Construtor de Esqueletos", url: "/bone", icon: Bone },
   { title: "📚 Dicionário de Teses", url: "/teses", icon: BookMarked },
+];
+
+const itemsRecursosGerais = [
+  { title: "📊 Radar de Recorrência", url: "/radar-recorrencia", icon: BarChart3 },
+  { title: "⏱️ Calculadora de Prazos", url: "/calculadora-prazos", icon: Clock },
   { title: "📖 Vade Mecum Online", url: "https://www4.planalto.gov.br/legislacao/", icon: BookOpen, external: true },
 ];
 
@@ -121,6 +124,44 @@ export function AppSidebar() {
               {items2aFase.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
+                    <NavLink
+                      to={canAccess2aFase ? item.url : "#"}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-white font-semibold hover:bg-white/10 transition-all duration-200 ${!canAccess2aFase ? "cursor-not-allowed" : ""}`}
+                      activeClassName="bg-white/10 text-white font-bold border-l-4 border-yellow-400 rounded-l-none"
+                      onClick={(e) => {
+                        if (!canAccess2aFase) {
+                          e.preventDefault();
+                        }
+                      }}
+                    >
+                      <item.icon className={`h-4 w-4 shrink-0 transition-colors
+                        ${location.pathname === item.url ? "text-yellow-400" : (canAccess2aFase ? "text-white" : "text-zinc-600")}
+                      `} />
+                      {!collapsed && (
+                        <div className="flex items-center w-full">
+                          <span className={`text-sm truncate ${!canAccess2aFase ? "text-zinc-600" : ""}`}>{item.title}</span>
+                          {!isAssinante2aFase && !loading && (
+                            <Badge variant="secondary" className="ml-2 text-[9px] px-1.5 py-0 bg-zinc-800 text-zinc-400 hover:bg-zinc-800 border-none rounded-full whitespace-nowrap">
+                              🔒 Exclusivo
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          {!collapsed && <SidebarGroupLabel className="px-3 text-[10px] font-bold tracking-wider text-zinc-500 mb-2">CENTRAL DE INTELIGÊNCIA</SidebarGroupLabel>}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {itemsRecursosGerais.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
                     {item.external ? (
                       <a
                         href={item.url}
@@ -128,42 +169,19 @@ export function AppSidebar() {
                         rel="noopener noreferrer"
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white font-semibold hover:bg-white/10 transition-all duration-200"
                       >
-                        <item.icon className={`h-4 w-4 shrink-0 ${canAccess2aFase ? "text-white" : "text-zinc-600"}`} />
-                        {!collapsed && (
-                          <div className="flex items-center w-full">
-                            <span className={`text-sm ${!canAccess2aFase ? "text-zinc-600" : ""}`}>{item.title}</span>
-                            {!isAssinante2aFase && !loading && (
-                              <Badge variant="secondary" className="ml-2 text-[9px] px-1.5 py-0 bg-zinc-800 text-zinc-400 hover:bg-zinc-800 border-none rounded-full whitespace-nowrap">
-                                🔒 Exclusivo
-                              </Badge>
-                            )}
-                          </div>
-                        )}
+                        <item.icon className="h-4 w-4 shrink-0 text-white" />
+                        {!collapsed && <span className="text-sm">{item.title}</span>}
                       </a>
                     ) : (
                       <NavLink
-                        to={canAccess2aFase ? item.url : "#"}
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-white font-semibold hover:bg-white/10 transition-all duration-200 ${!canAccess2aFase ? "cursor-not-allowed" : ""}`}
+                        to={item.url}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white font-semibold hover:bg-white/10 transition-all duration-200"
                         activeClassName="bg-white/10 text-white font-bold border-l-4 border-yellow-400 rounded-l-none"
-                        onClick={(e) => {
-                          if (!canAccess2aFase) {
-                            e.preventDefault();
-                          }
-                        }}
                       >
-                        <item.icon className={`h-4 w-4 shrink-0 transition-colors
-                          ${location.pathname === item.url ? "text-yellow-400" : (canAccess2aFase ? "text-white" : "text-zinc-600")}
+                        <item.icon className={`h-4 w-4 shrink-0 
+                          ${location.pathname === item.url ? "text-yellow-400" : "text-white"}
                         `} />
-                        {!collapsed && (
-                          <div className="flex items-center w-full">
-                            <span className={`text-sm truncate ${!canAccess2aFase ? "text-zinc-600" : ""}`}>{item.title}</span>
-                            {!isAssinante2aFase && !loading && (
-                              <Badge variant="secondary" className="ml-2 text-[9px] px-1.5 py-0 bg-zinc-800 text-zinc-400 hover:bg-zinc-800 border-none rounded-full whitespace-nowrap">
-                                🔒 Exclusivo
-                              </Badge>
-                            )}
-                          </div>
-                        )}
+                        {!collapsed && <span className="text-sm">{item.title}</span>}
                       </NavLink>
                     )}
                   </SidebarMenuButton>
