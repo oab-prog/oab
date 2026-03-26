@@ -112,7 +112,7 @@ export default function TreinoDiscursivasPage() {
 
       try {
         apiKey = (import.meta.env.VITE_GEMINI_API_KEY || "").trim();
-        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
+        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
         const materiaLabel = MATERIAS.find(m => m.id === materia)?.label;
         const instrucaoMotor = "Você é um membro da banca examinadora da OAB (FGV). Sua missão é gerar questões discursivas inéditas no padrão FGV OAB com fundamentação legal precisa.";
         const promptFinal = `${instrucaoMotor}\n\nGere 4 questões discursivas inéditas no padrão FGV OAB especificamente sobre o tema [${tema === "Sorteio Aleatório" ? "aleatório/maior recorrência" : tema}] da matéria [${materiaLabel}]. 
@@ -142,6 +142,12 @@ Retorne as questões começando cada uma com "Questão X: ".`;
       });
 
       const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Erro detalhado da API Gemini:', data);
+        throw new Error(data.error?.message || "Erro na resposta da API Gemini");
+      }
+
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
       
       if (text) {
@@ -233,6 +239,12 @@ Retorne o feedback formatado:
       });
 
       const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Erro detalhado da API Gemini:', data);
+        throw new Error(data.error?.message || "Erro na resposta da API Gemini");
+      }
+
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
       
       if (text) {

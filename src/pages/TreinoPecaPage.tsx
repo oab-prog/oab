@@ -79,7 +79,7 @@ export default function TreinoPecaPage() {
 
       try {
         apiKey = (import.meta.env.VITE_GEMINI_API_KEY || "").trim();
-        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
+        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
         
         // ESCUDO ANTI-ALUCINAÇÃO (Regex do Inspetor_Geral_v2.py adaptado para TS)
         const padroesJulgados = [
@@ -139,6 +139,12 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
       });
 
       const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Erro detalhado da API Gemini:', data);
+        throw new Error(data.error?.message || "Erro na resposta da API Gemini");
+      }
+
       let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
       
       if (text) {
