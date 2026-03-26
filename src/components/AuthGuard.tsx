@@ -30,20 +30,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   if (!session) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="w-full max-w-md bg-card border border-white/10 rounded-2xl p-8 shadow-2xl">
-          <div className="flex justify-center mb-6">
-            <img 
-              src="https://raw.githubusercontent.com/oab-prog/oab/main/logo.png" 
-              alt="Logo" 
-              className="h-16 w-16 object-contain"
-            />
-          </div>
-          <Auth />
-        </div>
-      </div>
-    );
+    return <Auth />;
   }
 
   return <>{children}</>;
