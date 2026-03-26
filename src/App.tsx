@@ -12,6 +12,10 @@ import PredicaoPage from "@/pages/PredicaoPage";
 import EticaFlashcards from "@/pages/EticaFlashcards";
 import DicionarioTeses from "@/pages/DicionarioTeses"; // <-- IMPORTAÇÃO DO DICIONÁRIO
 import TreinoPecaPage from "@/pages/TreinoPecaPage"; // <-- IMPORTAÇÃO DA 2ª FASE
+import TreinoDiscursivasPage from "@/pages/TreinoDiscursivasPage";
+import BuscadorEspelhosPage from "@/pages/BuscadorEspelhosPage";
+import ConstrutorEsqueletosPage from "@/pages/ConstrutorEsqueletosPage";
+import CalculadoraPrazosPage from "@/pages/CalculadoraPrazosPage";
 import TermsPage from "@/pages/TermsPage";
 import PrivacyPage from "@/pages/PrivacyPage";
 import NotFound from "./pages/NotFound";
@@ -58,6 +62,10 @@ const App = () => (
                   <Route path="/etica" element={<EticaFlashcards />} />
                   <Route path="/teses" element={<DicionarioTeses />} /> {/* <-- NOVA ROTA DE TESES */}
                   <Route path="/treino-peca" element={<TreinoPecaPage />} /> {/* <-- NOVA ROTA 2ª FASE */}
+                  <Route path="/treino-discursivas" element={<TreinoDiscursivasPage />} />
+                  <Route path="/buscador-espelhos" element={<BuscadorEspelhosPage />} />
+                  <Route path="/construtor-esqueletos" element={<ConstrutorEsqueletosPage />} />
+                  <Route path="/calculadora-prazos" element={<CalculadoraPrazosPage />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </AppLayout>

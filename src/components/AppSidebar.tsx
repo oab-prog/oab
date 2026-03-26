@@ -1,7 +1,8 @@
-import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles, BookMarked, PenTool, Lock } from "lucide-react";
+import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles, BookMarked, PenTool, Lock, Clock, Bone, Edit3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useProfile } from "@/hooks/use-profile";
+import { Badge } from "@/components/ui/badge";
 import {
   Sidebar,
   SidebarContent,
@@ -15,14 +16,15 @@ import {
 
 const items = [
   { title: "Início", url: "/", icon: Home },
-  { title: "Simulado Real", url: "/simulado", icon: Crosshair },
-  { title: "Dominando Ética", url: "/etica", icon: Sparkles },
-  { title: "Treino 2ª Fase", url: "/treino-peca", icon: PenTool }, // <-- NOVO MÓDULO
-  { title: "Buscador", url: "/buscador", icon: Search },
-  { title: "Radar de Recorrência", url: "/radar", icon: BarChart3 },
-  { title: "Dicionário de Teses", url: "/teses", icon: BookMarked }, // <-- O NOVO GOOGLE JURÍDICO
-  { title: "Veredito e Predição", url: "/predicao", icon: Scale },
-  { title: "Vademecum Online", url: "https://www4.planalto.gov.br/legislacao/", icon: BookOpen, external: true },
+  { title: "Treino de Peças", url: "/treino-peca", icon: PenTool },
+  { title: "Treino de Discursivas", url: "/treino-discursivas", icon: Edit3 },
+  { title: "Buscador de Espelhos FGV", url: "/buscador-espelhos", icon: Search },
+  { title: "Construtor de Esqueletos", url: "/construtor-esqueletos", icon: Bone },
+  { title: "Calculadora de Prazos", url: "/calculadora-prazos", icon: Clock },
+  { title: "Dicionário de Teses", url: "/teses", icon: BookMarked },
+  { title: "Vade Mecum Online", url: "https://www4.planalto.gov.br/legislacao/", icon: BookOpen, external: true },
+  { title: "Radar de Recorrência", url: "/radar", icon: BarChart3, exclusive1aFase: true },
+  { title: "Simulado Real", url: "/simulado", icon: Crosshair, exclusive1aFase: true },
 ];
 
 export function AppSidebar() {
@@ -86,15 +88,15 @@ export function AppSidebar() {
                         activeClassName="bg-primary/10 text-primary font-bold border-l-2 border-primary rounded-l-none"
                       >
                         <item.icon className={`h-4 w-4 shrink-0 
-                          ${item.title === "Dominando Ética" && location.pathname !== "/etica" ? "text-gold/70" : ""}
-                          ${item.title === "Treino 2ª Fase" && location.pathname !== "/treino-peca" ? "text-primary/70" : ""}
-                          ${item.title === "Dicionário de Teses" && location.pathname !== "/teses" ? "text-primary/70" : ""}
+                          ${location.pathname === item.url ? "text-primary" : "text-muted-foreground/70"}
                         `} />
                         {!collapsed && (
-                          <div className="flex items-center justify-between w-full">
-                            <span className="text-sm">{item.title}</span>
-                            {item.title === "Treino 2ª Fase" && !profile?.assinante_2_fase && (
-                              <Lock className="h-3 w-3 text-primary animate-pulse" />
+                          <div className="flex items-center justify-between w-full gap-2">
+                            <span className="text-sm truncate">{item.title}</span>
+                            {item.exclusive1aFase && (
+                              <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-muted/50 text-muted-foreground border-none whitespace-nowrap">
+                                🔒 Exclusivo 1ª Fase
+                              </Badge>
                             )}
                           </div>
                         )}
