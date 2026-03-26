@@ -148,9 +148,9 @@ const RadarRecorrenciaPage = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-6">
         <div>
           <h1 className="text-4xl font-black tracking-tight text-slate-900 flex items-center gap-2">
-            📊 Radar de Recorrência <Badge variant="secondary" className="ml-2">v1.6.0</Badge>
+            📊 Radar de Recorrência <Badge variant="secondary" className="ml-2">v1.6.1</Badge>
           </h1>
-          <p className="text-slate-500 mt-2 font-medium">
+          <p className="text-slate-600 mt-2 font-medium">
             Inteligência Estatística Baseada na Recorrência Real da FGV/OAB
           </p>
         </div>
@@ -173,7 +173,7 @@ const RadarRecorrenciaPage = () => {
               className="py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg transition-all"
             >
               <span className="text-lg mr-2">{data.emoji}</span>
-              <span className="hidden md:inline text-xs font-bold uppercase">{key}</span>
+              <span className="hidden md:inline text-xs font-bold uppercase text-slate-700">{key}</span>
             </TabsTrigger>
           ))}
         </TabsList>
@@ -188,7 +188,7 @@ const RadarRecorrenciaPage = () => {
                       <CardTitle className="text-2xl font-bold flex items-center gap-2">
                         {data.emoji} {data.nome}
                       </CardTitle>
-                      <CardDescription>Distribuição de incidência histórica</CardDescription>
+                      <CardDescription className="text-slate-600">Distribuição de incidência histórica</CardDescription>
                     </div>
                     <TrendingUp className="text-slate-400 h-8 w-8" />
                   </div>
@@ -207,7 +207,7 @@ const RadarRecorrenciaPage = () => {
                             type="category" 
                             scale="band" 
                             width={150}
-                            style={{ fontSize: '12px', fontWeight: 'bold' }}
+                            style={{ fontSize: '12px', fontWeight: 'bold', fill: '#0f172a' }}
                           />
                           <ChartTooltip content={<ChartTooltipContent />} />
                           <Bar dataKey="value" radius={[0, 4, 4, 0]}>
@@ -217,7 +217,12 @@ const RadarRecorrenciaPage = () => {
                                 fill={entry.value >= 25 ? '#ef4444' : entry.value >= 15 ? '#f97316' : '#3b82f6'} 
                               />
                             ))}
-                            <LabelList dataKey="value" position="right" formatter={(v: number) => `${v}%`} style={{ fontSize: '12px', fontWeight: 'bold' }} />
+                            <LabelList 
+                              dataKey="value" 
+                              position="right" 
+                              formatter={(v: number) => `${v}%`} 
+                              style={{ fontSize: '12px', fontWeight: 'bold', fill: '#0f172a' }} 
+                            />
                           </Bar>
                         </BarChart>
                       </ResponsiveContainer>
@@ -229,16 +234,16 @@ const RadarRecorrenciaPage = () => {
               <div className="space-y-6">
                 <Card className="border-2 shadow-none">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                    <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
                       <Target className="h-4 w-4" /> Top Temas
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {data.temas.map((tema, i) => (
                       <div key={i} className="space-y-1">
-                        <div className="flex justify-between text-sm font-bold">
+                        <div className="flex justify-between text-sm font-bold text-slate-800">
                           <span>{tema.name}</span>
-                          <span className={tema.value >= 18 ? "text-red-600" : "text-slate-600"}>{tema.value}%</span>
+                          <span className={tema.value >= 18 ? "text-red-600" : "text-slate-700"}>{tema.value}%</span>
                         </div>
                         <Progress 
                           value={tema.value * 3} 
@@ -257,8 +262,8 @@ const RadarRecorrenciaPage = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-xs text-slate-300 leading-relaxed">
-                      O tema <strong className="text-white">"{data.temas[0].name}"</strong> e a peça <strong className="text-white">"{data.pecas[0].name}"</strong> representam a maior probabilidade de cobrança nesta matéria. Foque 60% do seu tempo de revisão nestes tópicos.
+                    <p className="text-xs text-white leading-relaxed font-medium">
+                      O tema <strong className="text-white underline decoration-yellow-400">"{data.temas[0].name}"</strong> e a peça <strong className="text-white underline decoration-yellow-400">"{data.pecas[0].name}"</strong> representam a maior probabilidade de cobrança nesta matéria. Foque 60% do seu tempo de revisão nestes tópicos.
                     </p>
                   </CardContent>
                 </Card>
@@ -272,7 +277,7 @@ const RadarRecorrenciaPage = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-900">Estratégia de Peças</h4>
-                    <p className="text-xs text-slate-500">Pratique {data.pecas[0].name} pelo menos 3 vezes.</p>
+                    <p className="text-xs text-slate-600 font-medium">Pratique {data.pecas[0].name} pelo menos 3 vezes.</p>
                   </div>
                </div>
                <div className="p-4 border-2 rounded-xl flex items-center gap-4 bg-white">
@@ -281,7 +286,7 @@ const RadarRecorrenciaPage = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-900">Base Doutrinária</h4>
-                    <p className="text-xs text-slate-500">Domine {data.temas[0].name} para as questões discursivas.</p>
+                    <p className="text-xs text-slate-600 font-medium">Domine {data.temas[0].name} para as questões discursivas.</p>
                   </div>
                </div>
             </div>
