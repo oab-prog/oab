@@ -44,7 +44,14 @@ const INSTRUCOES_MOTORES: Record<string, string> = {
 export default function TreinoPecaPage() {
   const { profile, loading } = useProfile();
   const isAssinante = profile?.assinante_2_fase === true;
-  const [materia, setMateria] = useState("penal");
+  const [materia, setMateria] = useState(() => {
+    return localStorage.getItem("selectedSubject") || "penal";
+  });
+
+  const handleMateriaChange = (value: string) => {
+    setMateria(value);
+    localStorage.setItem("selectedSubject", value);
+  };
   const [textoAluno, setTextoAluno] = useState("");
   const [corrigindo, setCorrigindo] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -171,7 +178,7 @@ Emita seu LAUDO DE INSPEÇÃO agora.`;
           <h1 className="text-lg font-bold flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" /> JurisVision 2ª Fase
           </h1>
-          <Select value={materia} onValueChange={setMateria}>
+          <Select value={materia} onValueChange={handleMateriaChange}>
             <SelectTrigger className="w-[220px]">
               <SelectValue placeholder="Selecione a matéria" />
             </SelectTrigger>
