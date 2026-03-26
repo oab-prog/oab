@@ -1,6 +1,7 @@
-import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles, BookMarked, PenTool } from "lucide-react";
+import { Home, Crosshair, Search, BarChart3, Scale, BookOpen, Sparkles, BookMarked, PenTool, Lock } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
+import { useProfile } from "@/hooks/use-profile";
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +27,7 @@ const items = [
 
 export function AppSidebar() {
   const { state } = useSidebar();
+  const { profile } = useProfile();
   const collapsed = state === "collapsed";
   const location = useLocation();
 
@@ -43,7 +45,7 @@ export function AppSidebar() {
               />
               <div>
                 <h2 className="text-sm font-bold text-foreground tracking-tight leading-none mb-1">
-                  JurisVision 1ª Fase
+                  Portal JurisVision
                 </h2>
                 <p className="text-[9px] text-muted-foreground tracking-widest uppercase font-medium">
                   Themis M.A. Consultoria Forense
@@ -88,7 +90,14 @@ export function AppSidebar() {
                           ${item.title === "Treino 2ª Fase" && location.pathname !== "/treino-peca" ? "text-primary/70" : ""}
                           ${item.title === "Dicionário de Teses" && location.pathname !== "/teses" ? "text-primary/70" : ""}
                         `} />
-                        {!collapsed && <span className="text-sm">{item.title}</span>}
+                        {!collapsed && (
+                          <div className="flex items-center justify-between w-full">
+                            <span className="text-sm">{item.title}</span>
+                            {item.title === "Treino 2ª Fase" && !profile?.assinante_2_fase && (
+                              <Lock className="h-3 w-3 text-primary animate-pulse" />
+                            )}
+                          </div>
+                        )}
                       </NavLink>
                     )}
                   </SidebarMenuButton>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ShieldAlert, Sparkles, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useProfile } from "@/hooks/use-profile";
 
 const MATERIAS = [
   { id: "penal", label: "Direito Penal" },
@@ -27,24 +28,13 @@ const CASOS_PRATICOS: Record<string, string> = {
 };
 
 export default function TreinoPecaPage() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [isAssinante, setIsAssinante] = useState(false);
+  const { profile, loading } = useProfile();
+  const isAssinante = profile?.assinante_2_fase === true;
   const [materia, setMateria] = useState("penal");
   const [textoAluno, setTextoAluno] = useState("");
   const [corrigindo, setCorrigindo] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        setIsAssinante(session.user.user_metadata?.assinante_2_fase === true);
-      }
-      setLoading(false);
-    });
-  }, []);
 
   const handleCorrigir = async () => {
     if (!textoAluno.trim()) {
