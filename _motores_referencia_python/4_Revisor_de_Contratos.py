@@ -18,7 +18,7 @@ try:
 except ImportError:
     HAS_DDGS = False
 
-API_KEY_LOCAL = "AIzaSyA_riNjroJk8CtkvD2bbFVUw9vidFRzV24" 
+API_KEY_LOCAL = os.getenv("GEMINI_API_KEY") 
 dados_analise_atual = ""
 
 # ==========================================

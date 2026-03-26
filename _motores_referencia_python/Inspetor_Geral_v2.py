@@ -10,7 +10,7 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 
-API_KEY_LOCAL = "AIzaSyA_riNjroJk8CtkvD2bbFVUw9vidFRzV24"
+API_KEY_LOCAL = os.getenv("GEMINI_API_KEY")
 
 # ─── Variáveis Globais ───────────────────────────────────────────────────────
 caminhos_txt_globais = []

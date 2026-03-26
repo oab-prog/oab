@@ -13,7 +13,7 @@ from google.genai import types
 import re # O motor do Escudo Anti-Alucinação
 from typing import Dict, List, Any, Optional
 
-API_KEY_LOCAL = "AIzaSyA_riNjroJk8CtkvD2bbFVUw9vidFRzV24" 
+API_KEY_LOCAL = os.getenv("GEMINI_API_KEY") 
 
 # ==========================================
 # O ESCUDO DE CÓDIGO (REGEX) - PADRÃO 2.0

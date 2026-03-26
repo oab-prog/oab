@@ -21,7 +21,7 @@ try:
 except ImportError:
     HAS_DDGS = False
 
-API_KEY_LOCAL = "AIzaSyA_riNjroJk8CtkvD2bbFVUw9vidFRzV24" 
+API_KEY_LOCAL = os.getenv("GEMINI_API_KEY") 
 
 # ==========================================
 # O ESCUDO DE CÓDIGO (REGEX) - A PORTA DE AÇO

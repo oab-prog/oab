@@ -50,7 +50,7 @@ export default function TreinoPecaPage() {
     setFeedback(null);
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyA_riNjroJk8CtkvD2bbFVUw9vidFRzV24";
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       
       // ESCUDO ANTI-ALUCINAÇÃO (Regex do Inspetor_Geral_v2.py adaptado para TS)
       const padroesJulgados = [
