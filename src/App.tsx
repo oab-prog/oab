@@ -8,6 +8,7 @@ import Index from "@/pages/Index";
 import SimuladoPage from "@/pages/SimuladoPage";
 import BuscadorPage from "@/pages/BuscadorPage";
 import RadarPage from "@/pages/RadarPage";
+import RadarRecorrenciaPage from "@/pages/RadarRecorrenciaPage";
 import PredicaoPage from "@/pages/PredicaoPage";
 import EticaFlashcards from "@/pages/EticaFlashcards";
 import DicionarioTeses from "@/pages/DicionarioTeses"; // <-- IMPORTAÇÃO DO DICIONÁRIO
@@ -59,6 +60,7 @@ const App = () => (
                   <Route path="/simulado" element={<SimuladoPage />} />
                   <Route path="/buscador" element={<BuscadorPage />} />
                   <Route path="/radar" element={<RadarPage />} />
+                  <Route path="/radar-recorrencia" element={<RadarRecorrenciaPage />} />
                   <Route path="/predicao" element={<PredicaoPage />} />
                   <Route path="/etica" element={<EticaFlashcards />} />
                   <Route path="/teses" element={<SecondPhaseGuard><DicionarioTeses /></SecondPhaseGuard>} /> {/* <-- NOVA ROTA DE TESES */}

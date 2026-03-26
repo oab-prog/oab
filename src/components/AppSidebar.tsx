@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const items1aFase = [
-  { title: "🎯 Radar de Recorrência", url: "/radar", icon: BarChart3 },
+  { title: "📊 Radar de Recorrência", url: "/radar-recorrencia", icon: BarChart3 },
   { title: "📝 Simulado Real", url: "/simulado", icon: Crosshair },
   { title: "🗂️ Flashcards", url: "/etica", icon: Layers },
   { title: "🔎 Buscador de Questões", url: "/buscador", icon: Search },
