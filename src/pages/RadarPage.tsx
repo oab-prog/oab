@@ -2,15 +2,23 @@ import { getTopTemas, bancoCompleto } from "@/data/questoes"; // Alterado para b
 import { Card, CardContent } from "@/components/ui/card";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from "recharts";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, ChevronDown, ChevronUp } from "lucide-react";
 import { exportarQuestoesPDF } from "@/lib/pdf-export";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function RadarPage() {
+  // Verificação de renderização duplicada solicitada
+  console.log('--- RENDERIZANDO RADAR PAGE --- v1.0.5');
+  
   const hero = useScrollReveal();
   const chart = useScrollReveal(100);
   const clones = useScrollReveal(200);
+  const isMobile = useIsMobile();
+
+  const [visibleCount, setVisibleCount] = useState(5); // Reduzido para 5 conforme solicitado
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const topTemas = useMemo(() => getTopTemas(7), []);
   const chartData = useMemo(
@@ -36,10 +44,20 @@ export default function RadarPage() {
     return dupes;
   }, []);
 
+  useEffect(() => {
+    // Alerta de debug solicitado para mobile - confirmação de carregamento da versão nova
+    console.log('Efeito de montagem Radar executado');
+    alert(`Radar v1.0.5\nClones Detectados: ${clonesDetectados.length}\nModo Mobile: ${isMobile ? 'SIM' : 'NÃO'}`);
+  }, [clonesDetectados.length, isMobile]);
+
   const barColors = ["hsl(38, 92%, 50%)", "hsl(38, 80%, 55%)", "hsl(38, 70%, 60%)", "hsl(220, 14%, 35%)", "hsl(220, 14%, 30%)", "hsl(220, 14%, 28%)", "hsl(220, 14%, 25%)"];
 
+  const toggleExpand = (id: number) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
+
   return (
-    <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8">
+    <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8 relative z-10 block">
       <div ref={hero.ref} style={hero.style}>
         <h1 className="text-3xl font-bold mb-1">
           Radar de <span className="text-gradient-gold">Recorrência</span>
@@ -107,28 +125,68 @@ export default function RadarPage() {
         </div>
 
         {clonesDetectados.length > 0 ? (
-          <div className="grid grid-cols-1 gap-3 overflow-x-auto pb-2">
-            {/* Aumentei para mostrar as primeiras 20 detecções */}
-            {clonesDetectados.slice(0, 20).map((c, i) => (
-              <Card key={i} className="border-l-4 border-l-warning/50">
-                <CardContent className="p-4 flex items-start gap-3">
-                  <div className="flex flex-col gap-1 shrink-0 mt-0.5">
-                    <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase text-center">
-                      {c.tema.split(';')[0]} 
-                    </span>
-                    <span className="text-[9px] text-center text-warning font-bold">PADRÃO REPETIDO</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {c.pergunta.slice(0, 180)}...
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-3 overflow-y-auto max-h-[400px] min-h-[200px] pr-2 custom-scrollbar">
+              {clonesDetectados.slice(0, visibleCount).map((c) => {
+                const isExpanded = expandedId === c.id;
+                return (
+                  <Card 
+                    key={c.id} 
+                    className={`border-l-4 border-l-warning/50 cursor-pointer transition-all duration-200 select-none ${
+                      !isExpanded && !isMobile ? "hover:bg-warning/5" : ""
+                    } ${isExpanded ? "bg-warning/5 border-warning" : ""}`}
+                    onClick={() => toggleExpand(c.id)}
+                  >
+                    <CardContent className="p-4 flex items-start gap-4 min-h-[44px]">
+                      <div className="flex flex-col gap-1 shrink-0 mt-0.5">
+                        <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase text-center">
+                          {c.tema.split(';')[0]} 
+                        </span>
+                        <span className="text-[9px] text-center text-warning font-bold uppercase tracking-tighter">Clone</span>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <p className={`text-xs leading-relaxed ${isExpanded ? "text-foreground" : "text-muted-foreground line-clamp-2"}`}>
+                          {c.pergunta}
+                        </p>
+                        {isExpanded && (
+                          <div className="pt-2 mt-2 border-t border-warning/10 animate-reveal">
+                            <p className="text-[10px] font-bold text-warning uppercase mb-2">Comentário Estratégico:</p>
+                            <p className="text-xs text-muted-foreground leading-relaxed italic bg-black/20 p-3 rounded-lg border border-white/5">
+                              {c.comentario || "Análise em processamento para este padrão de repetição."}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="shrink-0 self-center">
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4 text-warning" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-muted-foreground/50" />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              {clonesDetectados.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-10">Nenhuma questão encontrada</p>
+              )}
+            </div>
+            {visibleCount < clonesDetectados.length && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-[10px] uppercase font-bold tracking-widest text-muted-foreground hover:text-primary transition-all py-6 border border-dashed border-white/5 bg-secondary/5"
+                onClick={() => setVisibleCount(prev => prev + 5)}
+              >
+                Ver mais {clonesDetectados.length - visibleCount} padrões detectados
+              </Button>
+            )}
           </div>
         ) : (
           <Card>
             <CardContent className="p-6 text-center">
-              <p className="text-sm text-muted-foreground">Nenhum clone detectado no banco de 1055 questões.</p>
+              <p className="text-sm text-muted-foreground">Nenhuma questão encontrada</p>
             </CardContent>
           </Card>
         )}

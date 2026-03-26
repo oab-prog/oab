@@ -69,8 +69,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </main>
 
           {/* Rodapé institucional da SoftGestão */}
-          <footer className="border-t border-border py-4 px-6 bg-background/50 text-center text-xs text-muted-foreground shrink-0">
+          <footer className="border-t border-border py-4 px-6 bg-background/50 text-center text-[10px] text-muted-foreground shrink-0 space-y-1">
             <p>© 2026 SoftGestão – Todos os direitos reservados – By Adriana Sousa</p>
+            <p className="opacity-50 uppercase tracking-widest font-semibold">JurisVision v1.0.5 — Build 26.03.2026</p>
           </footer>
         </div>
       </div>
