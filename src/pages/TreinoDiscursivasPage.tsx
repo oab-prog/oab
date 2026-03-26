@@ -114,12 +114,31 @@ Cada questão deve obrigatoriamente ter um item A e um item B.
 A resposta esperada deve conter a fundamentação legal precisa.
 Retorne as questões começando cada uma com "Questão X: ".`;
 
+      const requestBody = {
+        system_instruction: {
+          parts: [{ text: "Você é um membro da banca examinadora da OAB (FGV). Sua missão é gerar questões discursivas inéditas no padrão FGV OAB com fundamentação legal precisa." }]
+        },
+        contents: [{ 
+          role: "user",
+          parts: [{ text: `Gere 4 questões discursivas inéditas no padrão FGV OAB especificamente sobre o tema [${tema === "Sorteio Aleatório" ? "aleatório/maior recorrência" : tema}] da matéria [${materiaLabel}]. 
+Cada questão deve obrigatoriamente ter um item A e um item B. 
+A resposta esperada deve conter a fundamentação legal precisa.
+Retorne as questões começando cada uma com "Questão X: ".` }] 
+        }],
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+        ]
+      };
+
+      console.log('Payload enviado:', JSON.stringify(requestBody));
+
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
+        body: JSON.stringify(requestBody)
       });
 
       const data = await response.json();
@@ -186,12 +205,28 @@ RESPOSTA DO ALUNO: ${respostas[index]}
 
 Emita a correção agora.`;
 
+      const requestBody = {
+        system_instruction: {
+          parts: [{ text: instrucao }]
+        },
+        contents: [{ 
+          role: "user",
+          parts: [{ text: prompt }] 
+        }],
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+        ]
+      };
+
+      console.log('Payload enviado:', JSON.stringify(requestBody));
+
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: `${instrucao}\n\n${prompt}` }] }]
-        })
+        body: JSON.stringify(requestBody)
       });
 
       const data = await response.json();

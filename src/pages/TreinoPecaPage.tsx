@@ -114,12 +114,28 @@ ${textoAluno}
 
 Emita seu LAUDO DE INSPEÇÃO agora.`;
 
+      const requestBody = {
+        system_instruction: {
+          parts: [{ text: instrucaoCorregedor }]
+        },
+        contents: [{ 
+          role: "user",
+          parts: [{ text: promptUsuario }] 
+        }],
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+        ]
+      };
+
+      console.log('Payload enviado:', JSON.stringify(requestBody));
+
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: `${instrucaoCorregedor}\n\n${promptUsuario}` }] }]
-        })
+        body: JSON.stringify(requestBody)
       });
 
       const data = await response.json();
