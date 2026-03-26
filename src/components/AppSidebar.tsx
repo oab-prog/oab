@@ -43,8 +43,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-[#020617]">
-      <SidebarContent className="pt-6">
-        <div className="px-4 mb-8">
+      <SidebarContent className="pt-2 overflow-y-auto">
+        <div className="px-4 mb-4">
           {!collapsed ? (
             <div className="flex items-center gap-3">
               <img 

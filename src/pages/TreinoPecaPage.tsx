@@ -25,6 +25,20 @@ const CASOS_PRATICOS: Record<string, string> = {
   penal: "Enunciado: Tício, primário e de bons antecedentes, foi denunciado pela prática do crime de furto qualificado pelo rompimento de obstáculo (Art. 155, §4º, I, do CP). Durante a instrução, a única prova do rompimento de obstáculo foi o depoimento da vítima, não tendo sido realizado exame pericial, apesar de os vestígios ainda existirem à época dos fatos. Em sede de alegações finais, a defesa deve buscar a desclassificação para furto simples.",
   civil: "Enunciado: João celebrou contrato de compra e venda de um veículo com a concessionária X. Após 45 dias de uso, o motor fundiu devido a um defeito de fabricação preexistente. A concessionária se recusa a realizar o conserto em garantia, alegando que o prazo de 30 dias para vícios aparentes já expirou. Redija a peça cabível para defender os interesses de João.",
   trabalhista: "Enunciado: A empresa 'Alfa Ltda' dispensou o funcionário 'Beto' sem justa causa. Beto trabalhava em ambiente com ruído acima dos limites de tolerância sem o uso de EPIs adequados, mas nunca recebeu adicional de insalubridade. Além disso, cumpria jornada de 10 horas diárias sem o pagamento de horas extras. Elabore a petição inicial.",
+  tributario: "Enunciado: A empresa 'Beta S/A' recebeu notificação de lançamento de IPTU sobre imóvel que goza de imunidade tributária por ser templo de qualquer culto. A autoridade administrativa manteve o lançamento alegando que parte do imóvel é usada para residência do zelador. Redija a peça cabível para anular o débito.",
+  administrativo: "Enunciado: O Município 'Y' instaurou processo administrativo disciplinar contra o servidor estável 'Carlos', resultando em sua demissão. Ocorre que a comissão processante foi composta por servidores temporários, violando o estatuto local e a jurisprudência dos tribunais superiores. Elabore a peça para reverter a demissão.",
+  constitucional: "Enunciado: Lei do Estado 'Z' estabelece normas sobre proteção de dados pessoais em âmbito estadual, prevendo sanções administrativas severas. O partido político 'Alfa' entende que a lei padece de vício de inconstitucionalidade formal por invadir competência privativa da União. Proponha a ação direta cabível.",
+  empresarial: "Enunciado: A sociedade 'Ômega Ltda', em grave crise econômico-financeira, mas com viabilidade de soerguimento, pretende ingressar com pedido de recuperação judicial. Os sócios divergem sobre a inclusão de créditos com garantia fiduciária no plano. Redija a petição inicial de recuperação.",
+};
+
+const INSTRUCOES_MOTORES: Record<string, string> = {
+  penal: "Especialista em Direito Penal e Processo Penal. Foque em teses de nulidade, mérito e dosimetria. RIGOR: Alegações Finais, Apelação e HC.",
+  civil: "Especialista em Direito Civil e Processo Civil. Foque em pressupostos processuais, mérito e pedidos. RIGOR: Petição Inicial, Contestação e Agravo.",
+  trabalhista: "Especialista em Direito do Trabalho e Processo do Trabalho. Foque em verbas rescisórias, jornada e insalubridade. RIGOR: Reclamação Trabalhista e Recurso Ordinário.",
+  tributario: "Auditor Forense Especialista em Direito Tributário. RIGOR MÁXIMO para Mandado de Segurança, Agravo, Apelação e Repetição de Indébito. Validar CTN e CF/88. PROIBIDO inventar lançamentos ou CDAs.",
+  administrativo: "Especialista em Direito Administrativo. Foque em licitações, processos disciplinares e atos de improbidade. Validar Leis 8.112, 8.429, 9.784, 14.133. RIGOR: Apelação e MS.",
+  constitucional: "Auditor Forense Especialista em Direito Constitucional. Foque em Mandado de Segurança, ADI e Ação Popular. TRAVA LEGISLATIVA: CF/88.",
+  empresarial: "Especialista em Direito Empresarial. Foque em Direito Societário, Falência e Recuperação Judicial. Validar Código Civil, Lei 11.101, Lei 6.404.",
 };
 
 export default function TreinoPecaPage() {
@@ -70,8 +84,11 @@ export default function TreinoPecaPage() {
         }
       });
 
+      const instrucaoMotor = INSTRUCOES_MOTORES[materia] || "Especialista em Direito.";
       const instrucaoCorregedor = `Você é o M.A CORREGEDOR GERAL do JurisVision 2ª Fase.
 Sua única missão é destruir e apontar erros em documentos gerados por alunos ou outras IAs.
+DIRETRIZ ESPECÍFICA DO MOTOR: ${instrucaoMotor}
+
 Gere o LAUDO DE INSPEÇÃO com 4 seções:
 
 1. ALUCINAÇÕES FÁTICAS: Liste invenções de fatos que não constam no enunciado.
