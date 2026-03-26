@@ -106,33 +106,21 @@ Gere o LAUDO DE INSPEÇÃO com 4 seções:
 
 Seja frio, direto e rigoroso. Não use introduções cordiais.`;
 
-      const promptUsuario = `ENUNCIADO DO CASO PRÁTICO:
-${CASOS_PRATICOS[materia] || "Considere um caso complexo da matéria selecionada."}
+      const enunciadoLimpo = (CASOS_PRATICOS[materia] || "Considere um caso complexo da matéria selecionada.").replace(/\n/g, '\\n');
+      const textoAlunoLimpo = textoAluno.replace(/\n/g, '\\n');
 
-PEÇA DO ALUNO PARA INSPEÇÃO:
-${textoAluno}
-
-Emita seu LAUDO DE INSPEÇÃO agora.`;
+      const promptFinal = `${instrucaoCorregedor}\n\nENUNCIADO DO CASO PRÁTICO:\n${enunciadoLimpo}\n\nPEÇA DO ALUNO PARA INSPEÇÃO:\n${textoAlunoLimpo}\n\nEmita seu LAUDO DE INSPEÇÃO agora.`;
 
       const requestBody = {
-        system_instruction: {
-          parts: [{ text: instrucaoCorregedor }]
-        },
         contents: [{ 
           role: "user",
-          parts: [{ text: promptUsuario }] 
-        }],
-        safetySettings: [
-          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-        ]
+          parts: [{ text: promptFinal }] 
+        }]
       };
 
       console.log('Payload enviado:', JSON.stringify(requestBody));
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
