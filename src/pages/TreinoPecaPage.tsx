@@ -71,29 +71,35 @@ export default function TreinoPecaPage() {
     setFeedback(null);
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
-      
-      // ESCUDO ANTI-ALUCINAÇÃO (Regex do Inspetor_Geral_v2.py adaptado para TS)
-      const padroesJulgados = [
-        { regex: /HC\s+n[º°]?\s*[\d.]+\s?\/[A-Z]{2}/gi, tipo: "Habeas Corpus" },
-        { regex: /REsp\s+[\d.]+\s?\/[A-Z]{2}/gi, tipo: "Recurso Especial" },
-        { regex: /RHC\s+[\d.]+\s?\/[A-Z]{2}/gi, tipo: "RHC" },
-        { regex: /AgRg\s+no\s+HC\s+[\d.]+\s?\/[A-Z]{2}/gi, tipo: "AgRg no HC" },
-      ];
-
+      let apiKey = "";
+      let model = "";
+      let requestBody = {};
+      let url = "";
       let alertasRegex = "";
-      padroesJulgados.forEach(p => {
-        const matches = textoAluno.match(p.regex);
-        if (matches) {
-          matches.forEach(m => {
-            alertasRegex += `\n⚠️ [${p.tipo}] ${m} detectado. O Inspetor recomenda validar a numeração no site do STJ/JusBrasil.`;
-          });
-        }
-      });
 
-      const instrucaoMotor = INSTRUCOES_MOTORES[materia] || "Especialista em Direito.";
-      const instrucaoCorregedor = `Você é o M.A CORREGEDOR GERAL do JurisVision 2ª Fase.
+      try {
+        apiKey = (import.meta.env.VITE_GEMINI_API_KEY || "").trim();
+        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
+        
+        // ESCUDO ANTI-ALUCINAÇÃO (Regex do Inspetor_Geral_v2.py adaptado para TS)
+        const padroesJulgados = [
+          { regex: /HC\s+n[º°]?\s*[\d.]+\s?\/[A-Z]{2}/gi, tipo: "Habeas Corpus" },
+          { regex: /REsp\s+[\d.]+\s?\/[A-Z]{2}/gi, tipo: "Recurso Especial" },
+          { regex: /RHC\s+[\d.]+\s?\/[A-Z]{2}/gi, tipo: "RHC" },
+          { regex: /AgRg\s+no\s+HC\s+[\d.]+\s?\/[A-Z]{2}/gi, tipo: "AgRg no HC" },
+        ];
+
+        padroesJulgados.forEach(p => {
+          const matches = textoAluno.match(p.regex);
+          if (matches) {
+            matches.forEach(m => {
+              alertasRegex += `\n⚠️ [${p.tipo}] ${m} detectado. O Inspetor recomenda validar a numeração no site do STJ/JusBrasil.`;
+            });
+          }
+        });
+
+        const instrucaoMotor = INSTRUCOES_MOTORES[materia] || "Especialista em Direito.";
+        const instrucaoCorregedor = `Você é o M.A CORREGEDOR GERAL do JurisVision 2ª Fase.
 Sua única missão é destruir e apontar erros em documentos gerados por alunos ou outras IAs.
 DIRETRIZ ESPECÍFICA DO MOTOR: ${instrucaoMotor}
 
@@ -106,21 +112,27 @@ Gere o LAUDO DE INSPEÇÃO com 4 seções:
 
 Seja frio, direto e rigoroso. Não use introduções cordiais.`;
 
-      const enunciadoLimpo = (CASOS_PRATICOS[materia] || "Considere um caso complexo da matéria selecionada.").replace(/\n/g, '\\n');
-      const textoAlunoLimpo = textoAluno.replace(/\n/g, '\\n');
+        const enunciadoLimpo = (CASOS_PRATICOS[materia] || "Considere um caso complexo da matéria selecionada.").replace(/\n/g, '\\n');
+        const textoAlunoLimpo = textoAluno.replace(/\n/g, '\\n');
 
-      const promptFinal = `${instrucaoCorregedor}\n\nENUNCIADO DO CASO PRÁTICO:\n${enunciadoLimpo}\n\nPEÇA DO ALUNO PARA INSPEÇÃO:\n${textoAlunoLimpo}\n\nEmita seu LAUDO DE INSPEÇÃO agora.`;
+        const promptFinal = `${instrucaoCorregedor}\n\nENUNCIADO DO CASO PRÁTICO:\n${enunciadoLimpo}\n\nPEÇA DO ALUNO PARA INSPEÇÃO:\n${textoAlunoLimpo}\n\nEmita seu LAUDO DE INSPEÇÃO agora.`;
 
-      const requestBody = {
-        contents: [{ 
-          role: "user",
-          parts: [{ text: promptFinal }] 
-        }]
-      };
+        requestBody = {
+          contents: [{ 
+            role: "user",
+            parts: [{ text: promptFinal }] 
+          }]
+        };
 
-      console.log('Payload enviado:', JSON.stringify(requestBody));
+        url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+        console.log('URL de Destino:', url);
+        console.log('Payload enviado:', JSON.stringify(requestBody));
+      } catch (error) {
+        console.error('Erro na preparação do envio:', error);
+        throw error;
+      }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`, {
+      const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)

@@ -105,25 +105,37 @@ export default function TreinoDiscursivasPage() {
   const handleGerarQuestoes = async () => {
     setGerandoQuestoes(true);
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
-      const materiaLabel = MATERIAS.find(m => m.id === materia)?.label;
-      const instrucaoMotor = "Você é um membro da banca examinadora da OAB (FGV). Sua missão é gerar questões discursivas inéditas no padrão FGV OAB com fundamentação legal precisa.";
-      const promptFinal = `${instrucaoMotor}\n\nGere 4 questões discursivas inéditas no padrão FGV OAB especificamente sobre o tema [${tema === "Sorteio Aleatório" ? "aleatório/maior recorrência" : tema}] da matéria [${materiaLabel}]. 
+      let apiKey = "";
+      let model = "";
+      let requestBody = {};
+      let url = "";
+
+      try {
+        apiKey = (import.meta.env.VITE_GEMINI_API_KEY || "").trim();
+        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
+        const materiaLabel = MATERIAS.find(m => m.id === materia)?.label;
+        const instrucaoMotor = "Você é um membro da banca examinadora da OAB (FGV). Sua missão é gerar questões discursivas inéditas no padrão FGV OAB com fundamentação legal precisa.";
+        const promptFinal = `${instrucaoMotor}\n\nGere 4 questões discursivas inéditas no padrão FGV OAB especificamente sobre o tema [${tema === "Sorteio Aleatório" ? "aleatório/maior recorrência" : tema}] da matéria [${materiaLabel}]. 
 Cada questão deve obrigatoriamente ter um item A e um item B. 
 A resposta esperada deve conter a fundamentação legal precisa.
 Retorne as questões começando cada uma com "Questão X: ".`;
 
-      const requestBody = {
-        contents: [{ 
-          role: "user",
-          parts: [{ text: promptFinal }] 
-        }]
-      };
+        requestBody = {
+          contents: [{ 
+            role: "user",
+            parts: [{ text: promptFinal }] 
+          }]
+        };
 
-      console.log('Payload enviado:', JSON.stringify(requestBody));
+        url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+        console.log('URL de Destino:', url);
+        console.log('Payload enviado:', JSON.stringify(requestBody));
+      } catch (error) {
+        console.error('Erro na preparação do envio:', error);
+        throw error;
+      }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`, {
+      const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
@@ -171,9 +183,15 @@ Retorne as questões começando cada uma com "Questão X: ".`;
     setCorrigindo(novosCorrigindo);
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
-      const instrucao = `Você é o Corretor Especialista do JurisVision (Banca FGV). 
+      let apiKey = "";
+      let model = "";
+      let requestBody = {};
+      let url = "";
+
+      try {
+        apiKey = (import.meta.env.VITE_GEMINI_API_KEY || "").trim();
+        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
+        const instrucao = `Você é o Corretor Especialista do JurisVision (Banca FGV). 
 Sua missão é corrigir uma questão discursiva que possui itens A e B.
 Avalie a resposta do aluno com base no espelho de correção da OAB.
 
@@ -188,21 +206,27 @@ Retorne o feedback formatado:
 - FUNDAMENTAÇÃO LEGAL: (Quais artigos deveriam ter sido citados)
 - VEREDITO: (Dica cirúrgica para pontuar mais)`;
 
-      const questaoLimpa = questoes[index].replace(/\n/g, '\\n');
-      const respostaLimpa = respostas[index].replace(/\n/g, '\\n');
+        const questaoLimpa = questoes[index].replace(/\n/g, '\\n');
+        const respostaLimpa = respostas[index].replace(/\n/g, '\\n');
 
-      const promptFinal = `${instrucao}\n\nQUESTÃO: ${questaoLimpa}\nRESPOSTA DO ALUNO: ${respostaLimpa}\n\nEmita a correção agora.`;
+        const promptFinal = `${instrucao}\n\nQUESTÃO: ${questaoLimpa}\nRESPOSTA DO ALUNO: ${respostaLimpa}\n\nEmita a correção agora.`;
 
-      const requestBody = {
-        contents: [{ 
-          role: "user",
-          parts: [{ text: promptFinal }] 
-        }]
-      };
+        requestBody = {
+          contents: [{ 
+            role: "user",
+            parts: [{ text: promptFinal }] 
+          }]
+        };
 
-      console.log('Payload enviado:', JSON.stringify(requestBody));
+        url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+        console.log('URL de Destino:', url);
+        console.log('Payload enviado:', JSON.stringify(requestBody));
+      } catch (error) {
+        console.error('Erro na preparação do envio:', error);
+        throw error;
+      }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`, {
+      const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
