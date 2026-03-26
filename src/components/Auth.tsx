@@ -90,9 +90,6 @@ export function Auth({ onToggle }: { onToggle?: () => void }) {
                   className="h-20 w-20 mx-auto object-contain mb-6 drop-shadow-sm"
                 />
                 <h2 className="text-2xl font-bold tracking-tight">Acesse sua Área Pro</h2>
-                <h3 className="text-sm md:text-base font-black text-white text-center uppercase tracking-tight leading-tight my-6 px-4 drop-shadow-sm">
-                  ENTRE EM CONTATO AGORA E DESCUBRA O SEGREDO DA APROVAÇÃO NA OAB GUIADA POR DADOS!
-                </h3>
               </div>
 
               <Card className="border-none shadow-none bg-transparent">
@@ -183,10 +180,15 @@ export function Auth({ onToggle }: { onToggle?: () => void }) {
 
       {/* RODAPÉ DE AUTORIDADE */}
       <footer className="bg-background border-t border-border py-12 px-8">
+        <div className="max-w-6xl mx-auto mb-12 text-center">
+          <h3 className="text-lg md:text-xl font-black text-primary uppercase tracking-tight leading-tight px-4 drop-shadow-sm">
+            ENTRE EM CONTATO AGORA E DESCUBRA O SEGREDO DA APROVAÇÃO NA OAB GUIADA POR DADOS!
+          </h3>
+        </div>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="space-y-2 text-center md:text-left">
             <p className="font-bold text-lg">JurisVision</p>
-            <p className="text-sm text-muted-foreground">Themis Consultoria Forense</p>
+            <p className="text-sm text-muted-foreground">Themis Consultoria Forense By Adriana Sousa</p>
             <p className="text-xs text-muted-foreground">Sua segurança jurídica e pedagógica na OAB.</p>
           </div>
 
@@ -196,7 +198,7 @@ export function Auth({ onToggle }: { onToggle?: () => void }) {
               themis.ma.consultoria@gmail.com
             </a>
             <p className="text-[10px] text-muted-foreground mt-4 opacity-50 font-bold uppercase tracking-widest">
-              v1.2.1 — OFICIAL
+              v1.2.2 — OFICIAL
             </p>
           </div>
         </div>

@@ -16,7 +16,7 @@ export default function TermsPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-primary">2. Propriedade Intelectual</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Todo o conteúdo, algoritmos e funcionalidades, incluindo o "Radar de Recorrência", são propriedade exclusiva da Themis / Adriana Mourão. É expressamente proibido o uso de scrapers, ferramentas de mineração de dados, engenharia reversa ou qualquer tentativa de copiar a lógica de funcionamento da plataforma.
+            Todo o conteúdo, algoritmos e funcionalidades, incluindo o "Radar de Recorrência", são propriedade exclusiva da Themis M.A Consultoria Forense By Adriana Sousa. É expressamente proibido o uso de scrapers, ferramentas de mineração de dados, engenharia reversa ou qualquer tentativa de copiar a lógica de funcionamento da plataforma.
           </p>
         </section>
 
