@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ShieldAlert, Sparkles, AlertTriangle, CheckCircle2, Info, Maximize2, Minimize2, Play, Pause, RotateCcw, Eye, Clock } from "lucide-react";
+import { Loader2, ShieldAlert, Sparkles, AlertTriangle, CheckCircle2, Info, Maximize2, Minimize2, Play, Pause, RotateCcw, Eye, Clock, Download } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useProfile } from "@/hooks/use-profile";
+import { exportarPecaPDF } from "@/lib/pdf-export";
 
 const MATERIAS = [
   { id: "penal", label: "Direito Penal" },
@@ -270,6 +271,32 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
     }
   };
 
+  const handleExportPDF = () => {
+    if (!textoAluno.trim()) {
+      toast({
+        title: "Campo Vazio",
+        description: "Escreva sua peça antes de exportar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const materiaLabel = MATERIAS.find(m => m.id === materia)?.label || materia;
+    const nomeAluno = profile?.full_name || "Aluno JurisVision";
+    
+    exportarPecaPDF(
+      textoAluno,
+      materiaLabel,
+      nomeAluno,
+      `Peça_${materia}_${new Date().toISOString().slice(0, 10)}.pdf`
+    );
+
+    toast({
+      title: "PDF Gerado",
+      description: "Sua peça foi exportada com sucesso.",
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -344,6 +371,13 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
               <Eye className="h-4 w-4" /> {showEnunciadoFloating ? "OCULTAR" : "VER"} ENUNCIADO
             </Button>
           )}
+          <Button 
+            variant="outline"
+            className="font-bold gap-2"
+            onClick={handleExportPDF}
+          >
+            <Download className="h-4 w-4" /> EXPORTAR PDF
+          </Button>
           <Button 
             onClick={handleCorrigir} 
             disabled={corrigindo}

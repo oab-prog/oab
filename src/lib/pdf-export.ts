@@ -52,3 +52,61 @@ export function exportarQuestoesPDF(
 
   doc.save(filename);
 }
+
+export function exportarPecaPDF(
+  conteudo: string,
+  materia: string,
+  aluno: string,
+  filename: string
+) {
+  const doc = new jsPDF();
+  const pageW = doc.internal.pageSize.getWidth();
+  const margin = 20;
+  const maxW = pageW - margin * 2;
+  let y = 20;
+
+  // Header
+  doc.setFont("times", "bold");
+  doc.setFontSize(22);
+  doc.setTextColor(180, 130, 20);
+  doc.text("THEMIS M.A.", pageW / 2, y, { align: "center" });
+  y += 10;
+
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  doc.setFont("times", "normal");
+  doc.text(`JurisVision 2ª Fase | Inteligência Artificial Jurídica`, pageW / 2, y, { align: "center" });
+  y += 10;
+
+  doc.setDrawColor(180, 130, 20);
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, pageW - margin, y);
+  y += 10;
+
+  // Info
+  doc.setFontSize(12);
+  doc.setTextColor(40, 40, 40);
+  doc.setFont("times", "bold");
+  doc.text(`ALUNO: ${aluno.toUpperCase()}`, margin, y);
+  y += 7;
+  doc.text(`MATÉRIA: ${materia.toUpperCase()}`, margin, y);
+  y += 7;
+  doc.text(`DATA: ${new Date().toLocaleDateString("pt-BR")}`, margin, y);
+  y += 12;
+
+  // Content
+  doc.setFont("times", "normal");
+  doc.setFontSize(12);
+  const lines = doc.splitTextToSize(conteudo, maxW);
+  
+  lines.forEach((line: string) => {
+    if (y > 280) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.text(line, margin, y);
+    y += 7;
+  });
+
+  doc.save(filename);
+}

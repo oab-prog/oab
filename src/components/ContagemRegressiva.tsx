@@ -6,18 +6,9 @@ export default function ContagemRegressiva() {
   const [tempo1, setTempo1] = useState({ dias: 0, horas: 0, min: 0, seg: 0 });
   const [tempo2, setTempo2] = useState({ dias: 0, horas: 0, min: 0, seg: 0 });
 
-  // Datas Simuladas (1 mês e 2 meses à frente conforme solicitado)
-  const data1aFase = useMemo(() => {
-    const d = new Date();
-    d.setMonth(d.getMonth() + 1);
-    return d.getTime();
-  }, []);
-
-  const data2aFase = useMemo(() => {
-    const d = new Date();
-    d.setMonth(d.getMonth() + 2);
-    return d.getTime();
-  }, []);
+  // Datas Oficiais (2026)
+  const data1aFase = useMemo(() => new Date(2026, 4, 17, 13, 0).getTime(), []); 
+  const data2aFase = useMemo(() => new Date(2026, 6, 5, 13, 0).getTime(), []); 
 
   const calculateTimeLeft = (targetDate: number) => {
     const agora = new Date().getTime();
@@ -58,7 +49,7 @@ export default function ContagemRegressiva() {
                   Contagem 1ª Fase OAB
                 </p>
                 <p className="text-sm font-bold text-foreground">
-                  46º Exame Unificado
+                  46º Exame (17/05/2026)
                 </p>
               </div>
             </div>
@@ -102,7 +93,7 @@ export default function ContagemRegressiva() {
                   Contagem 2ª Fase OAB
                 </p>
                 <p className="text-sm font-bold text-foreground">
-                  Data a definir (Simulada)
+                  46º Exame (05/07/2026)
                 </p>
               </div>
             </div>
