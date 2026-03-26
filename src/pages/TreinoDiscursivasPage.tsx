@@ -19,6 +19,16 @@ const MATERIAS = [
   { id: "empresarial", label: "Direito Empresarial" },
 ];
 
+const TEMAS_POR_MATERIA: Record<string, string[]> = {
+  penal: ["Teoria do Crime", "Crimes em Espécie", "Execução Penal", "Recursos"],
+  civil: ["Família", "Sucessões", "Contratos", "Coisas", "Responsabilidade Civil"],
+  trabalhista: ["Vínculo", "Verbas Rescisórias", "Jornada", "Processo do Trabalho"],
+  tributario: ["Imunidade", "Competência", "Crédito Tributário", "Processo Judicial"],
+  administrativo: ["Agentes Públicos", "Licitações", "Atos Administrativos", "Improbidade"],
+  constitucional: ["Controle de Constitucionalidade", "Direitos Fundamentais", "Organização do Estado"],
+  empresarial: ["Sociedades", "Falência e Recuperação", "Títulos de Crédito"],
+};
+
 const QUESTOES_FIXAS: Record<string, string[]> = {
   penal: [
     "Questão 1: Diferencie erro de tipo de erro de proibição e explique as consequências jurídicas de cada um.",
@@ -73,6 +83,7 @@ export default function TreinoDiscursivasPage() {
     return localStorage.getItem("selectedSubject") || "penal";
   });
 
+  const [tema, setTema] = useState<string>("Sorteio Aleatório");
   const [questoes, setQuestoes] = useState<string[]>(QUESTOES_FIXAS[materia] || []);
   const [respostas, setRespostas] = useState<string[]>(["", "", "", ""]);
   const [feedbacks, setFeedbacks] = useState<(string | null)[]>([null, null, null, null]);
@@ -83,6 +94,7 @@ export default function TreinoDiscursivasPage() {
     setQuestoes(QUESTOES_FIXAS[materia] || []);
     setRespostas(["", "", "", ""]);
     setFeedbacks([null, null, null, null]);
+    setTema("Sorteio Aleatório");
   }, [materia]);
 
   const handleMateriaChange = (value: string) => {
@@ -94,10 +106,12 @@ export default function TreinoDiscursivasPage() {
     setGerandoQuestoes(true);
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      const prompt = `Você é um membro da banca examinadora da OAB. 
-Gere 4 questões discursivas inéditas para a 2ª fase em ${MATERIAS.find(m => m.id === materia)?.label}.
-As questões devem ser baseadas nos temas de maior recorrência desta matéria.
-Retorne apenas as questões, uma em cada linha, começando com "Questão X: ".`;
+      const materiaLabel = MATERIAS.find(m => m.id === materia)?.label;
+      const prompt = `Você é um membro da banca examinadora da OAB (FGV). 
+Gere 4 questões discursivas inéditas no padrão FGV OAB especificamente sobre o tema [${tema === "Sorteio Aleatório" ? "aleatório/maior recorrência" : tema}] da matéria [${materiaLabel}]. 
+Cada questão deve obrigatoriamente ter um item A e um item B. 
+A resposta esperada deve conter a fundamentação legal precisa.
+Retorne as questões começando cada uma com "Questão X: ".`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
@@ -114,9 +128,16 @@ Retorne apenas as questões, uma em cada linha, começando com "Questão X: ".`;
         const novasQuestoes = text.split("\n").filter((l: string) => l.trim().startsWith("Questão")).slice(0, 4);
         if (novasQuestoes.length === 4) {
           setQuestoes(novasQuestoes);
-          toast({ title: "Questões Geradas", description: "4 novas questões inéditas foram preparadas." });
+          toast({ title: "Estudo Dirigido Ativado", description: `4 questões preparadas sobre ${tema}.` });
         } else {
-          setQuestoes(QUESTOES_FIXAS[materia]);
+          // Se não veio no formato certo, tenta limpar e pegar 4 blocos
+          const blocos = text.split(/Questão \d:/).filter((b: string) => b.trim().length > 10).slice(0, 4);
+          if (blocos.length === 4) {
+            setQuestoes(blocos.map((b: string, i: number) => `Questão ${i+1}: ${b.trim()}`));
+            toast({ title: "Estudo Dirigido Ativado", description: `4 questões preparadas sobre ${tema}.` });
+          } else {
+            setQuestoes(QUESTOES_FIXAS[materia]);
+          }
         }
       }
     } catch (error) {
@@ -143,17 +164,20 @@ Retorne apenas as questões, uma em cada linha, começando com "Questão X: ".`;
 
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      const instrucao = `Você é o Corretor Especialista do JurisVision. 
-Sua missão é corrigir uma questão discursiva da 2ª Fase da OAB.
-Foque estritamente em dois critérios:
-1. INDICAÇÃO DO ARTIGO (0,10 a 0,15): Verifique se o aluno citou o dispositivo legal correto.
-2. FUNDAMENTAÇÃO JURÍDICA (até 1,10): Verifique se a explicação está correta e completa conforme o padrão FGV.
+      const instrucao = `Você é o Corretor Especialista do JurisVision (Banca FGV). 
+Sua missão é corrigir uma questão discursiva que possui itens A e B.
+Avalie a resposta do aluno com base no espelho de correção da OAB.
 
-Retorne um feedback curto e direto no formato:
-[NOTA FINAL]
-- ARTIGO: (Comentário sobre a citação legal)
-- FUNDAMENTAÇÃO: (Comentário sobre o conteúdo)
-- DICA: (Como melhorar)`;
+Foque estritamente nestes critérios para cada item:
+1. INDICAÇÃO DO ARTIGO (0,10 a 0,15): Verifique se o aluno citou o dispositivo legal correto.
+2. FUNDAMENTAÇÃO JURÍDICA (até 1,10): Verifique se a explicação técnica está correta.
+
+Retorne o feedback formatado:
+[NOTA FINAL TOTAL]
+- ITEM A: (Nota e Comentário)
+- ITEM B: (Nota e Comentário)
+- FUNDAMENTAÇÃO LEGAL: (Quais artigos deveriam ter sido citados)
+- VEREDITO: (Dica cirúrgica para pontuar mais)`;
 
       const prompt = `QUESTÃO: ${questoes[index]}
 RESPOSTA DO ALUNO: ${respostas[index]}
@@ -220,26 +244,40 @@ Emita a correção agora.`;
           <h1 className="text-lg font-bold flex items-center gap-2">
             <PenTool className="h-5 w-5 text-primary" /> Treino de Discursivas
           </h1>
-          <Select value={materia} onValueChange={handleMateriaChange}>
-            <SelectTrigger className="w-[220px]">
-              <SelectValue placeholder="Selecione a matéria" />
-            </SelectTrigger>
-            <SelectContent>
-              {MATERIAS.map((m) => (
-                <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2" 
-            onClick={handleGerarQuestoes}
-            disabled={gerandoQuestoes}
-          >
-            {gerandoQuestoes ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            Gerar Novas Questões
-          </Button>
+          <div className="flex items-center gap-2">
+            <Select value={materia} onValueChange={handleMateriaChange}>
+              <SelectTrigger className="w-[200px] bg-white text-black font-bold border-2 border-primary/20">
+                <SelectValue placeholder="Matéria" />
+              </SelectTrigger>
+              <SelectContent>
+                {MATERIAS.map((m) => (
+                  <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={tema} onValueChange={setTema}>
+              <SelectTrigger className="w-[240px] bg-white text-black font-medium border-2 border-primary/20">
+                <SelectValue placeholder="Tema para Treinar" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Sorteio Aleatório">🎲 Sorteio Aleatório</SelectItem>
+                {TEMAS_POR_MATERIA[materia]?.map((t) => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Button 
+              size="sm" 
+              className="gap-2 font-bold bg-primary hover:bg-primary/90 text-white" 
+              onClick={handleGerarQuestoes}
+              disabled={gerandoQuestoes}
+            >
+              {gerandoQuestoes ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              ATIVAR ESTUDO DIRIGIDO
+            </Button>
+          </div>
         </div>
       </div>
 
