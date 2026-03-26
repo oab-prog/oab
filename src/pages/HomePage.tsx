@@ -3,10 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { bancoCompleto, bancoEstrategico, missoes } from "@/data/questoes";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Crosshair, BookOpen, BarChart3, Scale } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function HomePage() {
-  const navigate = useNavigate();
   const missaoHoje = useMemo(() => missoes[Math.floor(Math.random() * missoes.length)], []);
   const hero = useScrollReveal(0);
   const mission = useScrollReveal(100);
@@ -70,15 +69,15 @@ export default function HomePage() {
       {/* Quick Actions */}
       <div ref={method.ref} style={method.style} className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {quickActions.map((a) => (
-          <button
+          <Link
             key={a.title}
-            onClick={() => navigate(a.path)}
+            to={a.path}
             className="group flex flex-col items-start p-4 rounded-lg bg-secondary border border-border hover:border-primary/30 transition-all duration-200 active:scale-[0.97] text-left"
           >
             <a.icon className="h-5 w-5 text-primary mb-3 group-hover:scale-110 transition-transform" />
             <p className="text-sm font-medium text-foreground">{a.title}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{a.desc}</p>
-          </button>
+          </Link>
         ))}
       </div>
 

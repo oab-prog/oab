@@ -1,10 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
-import Index from "@/pages/Index";
+import HomePage from "@/pages/HomePage";
 import SimuladoPage from "@/pages/SimuladoPage";
 import BuscadorPage from "@/pages/BuscadorPage";
 import RadarPage from "@/pages/RadarPage";
@@ -48,7 +48,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <WhatsAppFAB />
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <HashRouter>
         <Routes>
           <Route path="/termos" element={<TermsPage />} />
           <Route path="/privacidade" element={<PrivacyPage />} />
@@ -56,7 +56,7 @@ const App = () => (
             <AuthGuard>
               <AppLayout>
                 <Routes>
-                  <Route path="/" element={<Index />} /> 
+                  <Route path="/" element={<HomePage />} /> 
                   <Route path="/simulado-primeira-fase" element={<SimuladoPage />} />
                   <Route path="/buscador" element={<BuscadorPage />} />
                   <Route path="/radar" element={<RadarPage />} />
@@ -75,7 +75,7 @@ const App = () => (
             </AuthGuard>
           } />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
