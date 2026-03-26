@@ -21,6 +21,7 @@ import PrivacyPage from "@/pages/PrivacyPage";
 import NotFound from "./pages/NotFound";
 
 import { AuthGuard } from "@/components/AuthGuard";
+import { SecondPhaseGuard } from "@/components/SecondPhaseGuard";
 import { MessageCircle } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -60,12 +61,12 @@ const App = () => (
                   <Route path="/radar" element={<RadarPage />} />
                   <Route path="/predicao" element={<PredicaoPage />} />
                   <Route path="/etica" element={<EticaFlashcards />} />
-                  <Route path="/teses" element={<DicionarioTeses />} /> {/* <-- NOVA ROTA DE TESES */}
-                  <Route path="/treino-peca" element={<TreinoPecaPage />} /> {/* <-- NOVA ROTA 2ª FASE */}
-                  <Route path="/treino-discursivas" element={<TreinoDiscursivasPage />} />
-                  <Route path="/buscador-espelhos" element={<BuscadorEspelhosPage />} />
-                  <Route path="/construtor-esqueletos" element={<ConstrutorEsqueletosPage />} />
-                  <Route path="/calculadora-prazos" element={<CalculadoraPrazosPage />} />
+                  <Route path="/teses" element={<SecondPhaseGuard><DicionarioTeses /></SecondPhaseGuard>} /> {/* <-- NOVA ROTA DE TESES */}
+                  <Route path="/treino-peca" element={<SecondPhaseGuard><TreinoPecaPage /></SecondPhaseGuard>} /> {/* <-- NOVA ROTA 2ª FASE */}
+                  <Route path="/treino-discursivas" element={<SecondPhaseGuard><TreinoDiscursivasPage /></SecondPhaseGuard>} />
+                  <Route path="/buscador-espelhos" element={<SecondPhaseGuard><BuscadorEspelhosPage /></SecondPhaseGuard>} />
+                  <Route path="/construtor-esqueletos" element={<SecondPhaseGuard><ConstrutorEsqueletosPage /></SecondPhaseGuard>} />
+                  <Route path="/calculadora-prazos" element={<SecondPhaseGuard><CalculadoraPrazosPage /></SecondPhaseGuard>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </AppLayout>

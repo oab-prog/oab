@@ -23,7 +23,7 @@ export function useProfile() {
           .from("profiles" as any) as any)
           .select("*")
           .eq("id", session.user.id)
-          .maybeSingle();
+          .single();
 
         if (mounted) {
           if (error) {

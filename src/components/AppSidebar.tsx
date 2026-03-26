@@ -35,10 +35,11 @@ const items2aFase = [
 
 export function AppSidebar() {
   const { state } = useSidebar();
-  const { profile } = useProfile();
+  const { profile, loading } = useProfile();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const isAssinante2aFase = profile?.assinante_2_fase === true;
+  const canAccess2aFase = loading || isAssinante2aFase;
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-sidebar">
@@ -132,7 +133,7 @@ export function AppSidebar() {
                         {!collapsed && (
                           <div className="flex items-center justify-between w-full gap-2">
                             <span className="text-sm">{item.title}</span>
-                            {!isAssinante2aFase && (
+                            {!isAssinante2aFase && !loading && (
                               <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-muted/50 text-muted-foreground border-none whitespace-nowrap">
                                 🔒 Exclusivo
                               </Badge>
@@ -142,11 +143,11 @@ export function AppSidebar() {
                       </a>
                     ) : (
                       <NavLink
-                        to={isAssinante2aFase ? item.url : "#"}
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 ${!isAssinante2aFase ? "opacity-70 cursor-not-allowed" : ""}`}
+                        to={canAccess2aFase ? item.url : "#"}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 ${!canAccess2aFase ? "opacity-70 cursor-not-allowed" : ""}`}
                         activeClassName="bg-primary/10 text-primary font-bold border-l-2 border-primary rounded-l-none"
                         onClick={(e) => {
-                          if (!isAssinante2aFase) {
+                          if (!canAccess2aFase) {
                             e.preventDefault();
                             // Optional: show toast or redirect
                           }
@@ -158,7 +159,7 @@ export function AppSidebar() {
                         {!collapsed && (
                           <div className="flex items-center justify-between w-full gap-2">
                             <span className="text-sm truncate">{item.title}</span>
-                            {!isAssinante2aFase && (
+                            {!isAssinante2aFase && !loading && (
                               <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-muted/50 text-muted-foreground border-none whitespace-nowrap">
                                 🔒 Exclusivo
                               </Badge>
