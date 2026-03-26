@@ -38,8 +38,8 @@ export function AppSidebar() {
   const { profile, loading } = useProfile();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const isAssinante2aFase = profile?.assinante_2_fase === true;
-  const canAccess2aFase = loading || isAssinante2aFase;
+  const isAssinante2aFase = !!profile?.assinante_2_fase;
+  const canAccess2aFase = isAssinante2aFase;
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-sidebar">
@@ -50,15 +50,15 @@ export function AppSidebar() {
               <img 
                 src="https://raw.githubusercontent.com/oab-prog/oab/main/logo.png" 
                 alt="Logo JurisVision" 
-                className="h-9 w-9 object-contain"
+                className="h-10 w-10 object-contain brightness-110"
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
               <div>
                 <h2 className="text-sm font-bold text-foreground tracking-tight leading-none mb-1">
-                  Portal JurisVision
+                  Themis M.A.
                 </h2>
-                <p className="text-[9px] text-muted-foreground tracking-widest uppercase font-medium">
-                  Themis M.A. Consultoria Forense
+                <p className="text-[10px] text-muted-foreground/80 tracking-widest uppercase font-semibold">
+                  Consultoria Forense
                 </p>
               </div>
             </div>
@@ -79,8 +79,8 @@ export function AppSidebar() {
                 <NavLink
                   to="/"
                   end
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
-                  activeClassName="bg-primary/10 text-primary font-bold border-l-2 border-primary rounded-l-none"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200"
+                  activeClassName="bg-sidebar-accent text-primary font-bold border-l-2 border-primary rounded-l-none"
                 >
                   <Home className={`h-4 w-4 shrink-0 ${location.pathname === "/" ? "text-primary" : "text-muted-foreground/70"}`} />
                   {!collapsed && <span className="text-sm">Início</span>}
@@ -99,12 +99,11 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
-                      activeClassName="bg-primary/10 text-primary font-bold border-l-2 border-primary rounded-l-none"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200"
+                      activeClassName="bg-sidebar-accent text-primary font-bold border-l-2 border-primary rounded-l-none"
                     >
                       <item.icon className={`h-4 w-4 shrink-0 
                         ${location.pathname === item.url ? "text-primary" : "text-muted-foreground/70"}
-                        ${item.title === "Dominando Ética" ? "text-gold" : ""}
                       `} />
                       {!collapsed && <span className="text-sm">{item.title}</span>}
                     </NavLink>
@@ -127,14 +126,14 @@ export function AppSidebar() {
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200"
                       >
-                        <item.icon className="h-4 w-4 shrink-0 text-muted-foreground/70" />
+                        <item.icon className={`h-4 w-4 shrink-0 ${canAccess2aFase ? "text-muted-foreground/70" : "text-muted-foreground/40"}`} />
                         {!collapsed && (
-                          <div className="flex items-center justify-between w-full gap-2">
-                            <span className="text-sm">{item.title}</span>
+                          <div className="flex items-center w-full">
+                            <span className={`text-sm ${!canAccess2aFase ? "text-muted-foreground/60" : ""}`}>{item.title}</span>
                             {!isAssinante2aFase && !loading && (
-                              <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-muted/50 text-muted-foreground border-none whitespace-nowrap">
+                              <Badge variant="secondary" className="ml-2 text-[9px] px-1.5 py-0 bg-zinc-800 text-zinc-400 hover:bg-zinc-800 border-none rounded-full whitespace-nowrap">
                                 🔒 Exclusivo
                               </Badge>
                             )}
@@ -144,23 +143,22 @@ export function AppSidebar() {
                     ) : (
                       <NavLink
                         to={canAccess2aFase ? item.url : "#"}
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 ${!canAccess2aFase ? "opacity-70 cursor-not-allowed" : ""}`}
-                        activeClassName="bg-primary/10 text-primary font-bold border-l-2 border-primary rounded-l-none"
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200 ${!canAccess2aFase ? "cursor-not-allowed" : ""}`}
+                        activeClassName="bg-sidebar-accent text-primary font-bold border-l-2 border-primary rounded-l-none"
                         onClick={(e) => {
                           if (!canAccess2aFase) {
                             e.preventDefault();
-                            // Optional: show toast or redirect
                           }
                         }}
                       >
-                        <item.icon className={`h-4 w-4 shrink-0 
-                          ${location.pathname === item.url ? "text-primary" : "text-muted-foreground/70"}
+                        <item.icon className={`h-4 w-4 shrink-0 transition-colors
+                          ${location.pathname === item.url ? "text-primary" : (canAccess2aFase ? "text-muted-foreground/70" : "text-muted-foreground/40")}
                         `} />
                         {!collapsed && (
-                          <div className="flex items-center justify-between w-full gap-2">
-                            <span className="text-sm truncate">{item.title}</span>
+                          <div className="flex items-center w-full">
+                            <span className={`text-sm truncate ${!canAccess2aFase ? "text-muted-foreground/60" : ""}`}>{item.title}</span>
                             {!isAssinante2aFase && !loading && (
-                              <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-muted/50 text-muted-foreground border-none whitespace-nowrap">
+                              <Badge variant="secondary" className="ml-2 text-[9px] px-1.5 py-0 bg-zinc-800 text-zinc-400 hover:bg-zinc-800 border-none rounded-full whitespace-nowrap">
                                 🔒 Exclusivo
                               </Badge>
                             )}
