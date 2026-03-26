@@ -112,7 +112,7 @@ export default function TreinoDiscursivasPage() {
 
       try {
         apiKey = (import.meta.env.VITE_GEMINI_API_KEY || "").trim();
-        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
+        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
         const materiaLabel = MATERIAS.find(m => m.id === materia)?.label;
         const instrucaoMotor = "Você é um membro da banca examinadora da OAB (FGV). Sua missão é gerar questões discursivas inéditas no padrão FGV OAB com fundamentação legal precisa.";
         const promptFinal = `${instrucaoMotor}\n\nGere 4 questões discursivas inéditas no padrão FGV OAB especificamente sobre o tema [${tema === "Sorteio Aleatório" ? "aleatório/maior recorrência" : tema}] da matéria [${materiaLabel}]. 
@@ -127,7 +127,7 @@ Retorne as questões começando cada uma com "Questão X: ".`;
           }]
         };
 
-        url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+        url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         console.log('URL de Destino:', url);
         console.log('Payload enviado:', JSON.stringify(requestBody));
       } catch (error) {
@@ -135,11 +135,21 @@ Retorne as questões começando cada uma com "Questão X: ".`;
         throw error;
       }
 
-      const response = await fetch(url, {
+      let response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
       });
+
+      if (!response.ok && model === 'gemini-2.5-flash') {
+        console.warn('Falha no gemini-2.5-flash, tentando fallback para gemini-1.5-flash');
+        const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        response = await fetch(fallbackUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody)
+        });
+      }
 
       const data = await response.json();
 
@@ -212,10 +222,10 @@ Retorne o feedback formatado:
 - FUNDAMENTAÇÃO LEGAL: (Quais artigos deveriam ter sido citados)
 - VEREDITO: (Dica cirúrgica para pontuar mais)`;
 
-        const questaoLimpa = questoes[index].replace(/\n/g, '\\n');
-        const respostaLimpa = respostas[index].replace(/\n/g, '\\n');
+        const questaoOriginal = questoes[index];
+        const respostaOriginal = respostas[index];
 
-        const promptFinal = `${instrucao}\n\nQUESTÃO: ${questaoLimpa}\nRESPOSTA DO ALUNO: ${respostaLimpa}\n\nEmita a correção agora.`;
+        const promptFinal = `${instrucao}\n\nQUESTÃO: ${questaoOriginal}\nRESPOSTA DO ALUNO: ${respostaOriginal}\n\nEmita a correção agora.`;
 
         requestBody = {
           contents: [{ 
@@ -224,7 +234,7 @@ Retorne o feedback formatado:
           }]
         };
 
-        url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+        url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         console.log('URL de Destino:', url);
         console.log('Payload enviado:', JSON.stringify(requestBody));
       } catch (error) {
@@ -232,11 +242,21 @@ Retorne o feedback formatado:
         throw error;
       }
 
-      const response = await fetch(url, {
+      let response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
       });
+
+      if (!response.ok && model === 'gemini-2.5-flash') {
+        console.warn('Falha no gemini-2.5-flash, tentando fallback para gemini-1.5-flash');
+        const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        response = await fetch(fallbackUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody)
+        });
+      }
 
       const data = await response.json();
 

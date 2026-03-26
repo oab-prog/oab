@@ -79,7 +79,7 @@ export default function TreinoPecaPage() {
 
       try {
         apiKey = (import.meta.env.VITE_GEMINI_API_KEY || "").trim();
-        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
+        model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
         
         // ESCUDO ANTI-ALUCINAÇÃO (Regex do Inspetor_Geral_v2.py adaptado para TS)
         const padroesJulgados = [
@@ -112,10 +112,10 @@ Gere o LAUDO DE INSPEÇÃO com 4 seções:
 
 Seja frio, direto e rigoroso. Não use introduções cordiais.`;
 
-        const enunciadoLimpo = (CASOS_PRATICOS[materia] || "Considere um caso complexo da matéria selecionada.").replace(/\n/g, '\\n');
-        const textoAlunoLimpo = textoAluno.replace(/\n/g, '\\n');
+        const enunciadoOriginal = CASOS_PRATICOS[materia] || "Considere um caso complexo da matéria selecionada.";
+        const textoAlunoOriginal = textoAluno;
 
-        const promptFinal = `${instrucaoCorregedor}\n\nENUNCIADO DO CASO PRÁTICO:\n${enunciadoLimpo}\n\nPEÇA DO ALUNO PARA INSPEÇÃO:\n${textoAlunoLimpo}\n\nEmita seu LAUDO DE INSPEÇÃO agora.`;
+        const promptFinal = `${instrucaoCorregedor}\n\nENUNCIADO DO CASO PRÁTICO:\n${enunciadoOriginal}\n\nPEÇA DO ALUNO PARA INSPEÇÃO:\n${textoAlunoOriginal}\n\nEmita seu LAUDO DE INSPEÇÃO agora.`;
 
         requestBody = {
           contents: [{ 
@@ -124,7 +124,7 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
           }]
         };
 
-        url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+        url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         console.log('URL de Destino:', url);
         console.log('Payload enviado:', JSON.stringify(requestBody));
       } catch (error) {
@@ -132,11 +132,21 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
         throw error;
       }
 
-      const response = await fetch(url, {
+      let response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody)
       });
+
+      if (!response.ok && model === 'gemini-2.5-flash') {
+        console.warn('Falha no gemini-2.5-flash, tentando fallback para gemini-1.5-flash');
+        const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        response = await fetch(fallbackUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody)
+        });
+      }
 
       const data = await response.json();
 
