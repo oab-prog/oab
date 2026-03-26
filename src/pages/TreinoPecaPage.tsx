@@ -5,11 +5,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ShieldAlert, Sparkles, AlertTriangle, CheckCircle2, Info, Maximize2, Minimize2, Play, Pause, RotateCcw, Eye, Clock, Download } from "lucide-react";
+import { Loader2, ShieldAlert, Sparkles, AlertTriangle, CheckCircle2, Info, Maximize2, Minimize2, Play, Pause, RotateCcw, Eye, Clock, Download, PenTool } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useProfile } from "@/hooks/use-profile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { exportarPecaPDF } from "@/lib/pdf-export";
 
 const MATERIAS = [
@@ -44,6 +46,7 @@ const INSTRUCOES_MOTORES: Record<string, string> = {
 
 export default function TreinoPecaPage() {
   const { profile, loading } = useProfile();
+  const isMobile = useIsMobile();
   const isAssinante = profile?.assinante_2_fase === true;
   const [materia, setMateria] = useState(() => {
     return localStorage.getItem("selectedSubject") || "penal";
@@ -325,43 +328,42 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
   }
 
   return (
-    <div className={`h-[calc(100vh-3.5rem)] flex flex-col ${isFocusMode ? "fixed inset-0 z-50 bg-background h-screen" : ""}`}>
-      {/* CABEÇALHO COM CRONÔMETRO v1.9.5 */}
-      <div className="border-b bg-card p-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          {!isFocusMode && (
-            <h1 className="text-lg font-bold flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" /> JurisVision 2ª Fase
-            </h1>
-          )}
-          <Select value={materia} onValueChange={handleMateriaChange}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Selecione a matéria" />
-            </SelectTrigger>
-            <SelectContent>
-              {MATERIAS.map((m) => (
-                <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    <div className={`h-[calc(100vh-3.5rem)] flex flex-col ${isFocusMode ? "fixed inset-0 z-50 bg-background h-screen" : ""} ${isMobile ? "h-screen" : ""}`}>
+      {/* CABEÇALHO COM CRONÔMETRO v1.9.8 */}
+      <div className={`border-b bg-card p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between shrink-0 gap-4 ${isMobile ? "sticky top-0 z-40" : ""}`}>
+        <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+          <div className="flex items-center gap-2">
+            {!isFocusMode && !isMobile && (
+              <h1 className="text-lg font-bold flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" /> JurisVision 2ª Fase
+              </h1>
+            )}
+            <Select value={materia} onValueChange={handleMateriaChange}>
+              <SelectTrigger className="w-[160px] sm:w-[200px]">
+                <SelectValue placeholder="Matéria" />
+              </SelectTrigger>
+              <SelectContent>
+                {MATERIAS.map((m) => (
+                  <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* TIMER COMPONENT */}
-          <div className="flex items-center gap-3 px-4 py-1.5 bg-muted/40 rounded-full border border-border/50">
-            <Clock className={`h-4 w-4 ${isActive ? "text-primary animate-pulse" : "text-muted-foreground"}`} />
-            <span className="font-mono font-bold text-sm tracking-tighter w-16">{formatTime(seconds)}</span>
-            <div className="flex items-center gap-1 border-l ml-1 pl-2">
-              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsActive(!isActive)}>
-                {isActive ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3 fill-current" />}
-              </Button>
-              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleResetTimer}>
-                <RotateCcw className="h-3 w-3" />
+          <div className="flex items-center gap-2 px-3 py-1 bg-muted/40 rounded-full border border-border/50">
+            <Clock className={`h-3.5 w-3.5 ${isActive ? "text-primary animate-pulse" : "text-muted-foreground"}`} />
+            <span className="font-mono font-bold text-xs tracking-tighter w-14">{formatTime(seconds)}</span>
+            <div className="flex items-center gap-1 border-l ml-1 pl-1">
+              <Button size="icon" variant="ghost" className="h-5 w-5" onClick={() => setIsActive(!isActive)}>
+                {isActive ? <Pause className="h-2.5 w-2.5" /> : <Play className="h-2.5 w-2.5 fill-current" />}
               </Button>
             </div>
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
-          {isFocusMode && (
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          {isFocusMode && !isMobile && (
             <Button 
               variant="outline" 
               size="sm" 
@@ -373,21 +375,23 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
           )}
           <Button 
             variant="outline"
-            className="font-bold gap-2"
+            size={isMobile ? "icon" : "sm"}
+            className="font-bold gap-2 shrink-0"
             onClick={handleExportPDF}
           >
-            <Download className="h-4 w-4" /> EXPORTAR PDF
+            <Download className="h-4 w-4" /> {!isMobile && "EXPORTAR PDF"}
           </Button>
           <Button 
             onClick={handleCorrigir} 
             disabled={corrigindo}
-            className="bg-primary hover:bg-primary/90 text-white font-bold gap-2"
+            size={isMobile ? "sm" : "default"}
+            className="bg-primary hover:bg-primary/90 text-white font-bold gap-2 flex-1 sm:flex-none"
           >
             {corrigindo ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldAlert className="h-4 w-4" />}
-            CORRIGIR PEÇA COM INSPETOR
+            {isMobile ? "CORRIGIR" : "CORRIGIR PEÇA COM INSPETOR"}
           </Button>
           {isFocusMode && (
-            <Button variant="ghost" size="icon" onClick={toggleFocusMode}>
+            <Button variant="ghost" size="icon" onClick={toggleFocusMode} className="shrink-0">
               <Minimize2 className="h-5 w-5" />
             </Button>
           )}
@@ -396,7 +400,7 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
 
       <div className="flex-1 overflow-hidden relative">
         {/* Floating Enunciado in Focus Mode */}
-        {isFocusMode && showEnunciadoFloating && (
+        {isFocusMode && showEnunciadoFloating && !isMobile && (
           <div className="absolute left-8 top-8 z-50 w-1/3 max-h-[70vh] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <Card className="border-2 border-primary/20 bg-background/95 backdrop-blur-sm">
               <CardHeader className="py-3 bg-muted/30">
@@ -411,82 +415,150 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
           </div>
         )}
 
-        <ResizablePanelGroup direction="horizontal">
-          {/* LADO ESQUERDO: ENUNCIADO E FEEDBACK (Só visível se não estiver no modo foco) */}
-          {!isFocusMode && (
-            <>
-              <ResizablePanel defaultSize={40} minSize={30}>
-                <div className="h-full flex flex-col border-r">
-                  <ScrollArea className="flex-1">
-                    <div className="p-6 space-y-6">
-                      <section>
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
-                          <Info className="h-4 w-4" /> Enunciado do Caso Prático
-                        </h3>
-                        <Card className="bg-muted/30 border-dashed">
-                          <CardContent className="pt-6 text-sm leading-relaxed">
-                            {CASOS_PRATICOS[materia] || "Escolha uma matéria para visualizar o caso."}
-                          </CardContent>
-                        </Card>
-                      </section>
+        {isMobile ? (
+          <Tabs defaultValue="editor" className="h-full flex flex-col">
+            <TabsList className="grid w-full grid-cols-2 rounded-none border-b h-12 shrink-0">
+              <TabsTrigger value="enunciado" className="font-bold uppercase text-[10px] tracking-widest">Enunciado do Caso</TabsTrigger>
+              <TabsTrigger value="editor" className="font-bold uppercase text-[10px] tracking-widest">Editor de Peça</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="enunciado" className="flex-1 overflow-hidden m-0 p-0">
+              <ScrollArea className="h-full">
+                <div className="p-4 space-y-6">
+                  <section>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
+                      <Info className="h-4 w-4" /> Enunciado do Caso Prático
+                    </h3>
+                    <Card className="bg-muted/30 border-dashed">
+                      <CardContent className="pt-6 text-sm leading-relaxed">
+                        {CASOS_PRATICOS[materia] || "Escolha uma matéria para visualizar o caso."}
+                      </CardContent>
+                    </Card>
+                  </section>
 
-                      {feedback && (
-                        <section className="animate-in fade-in slide-in-from-left-4 duration-500">
-                          <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4" /> Laudo do Inspetor Geral
+                  {feedback && (
+                    <section className="animate-in fade-in slide-in-from-left-4 duration-500">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-primary mb-3 flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4" /> Laudo do Inspetor Geral
+                      </h3>
+                      <Card className={`border-2 ${feedback.includes("REPROVADO") ? "border-destructive/50 bg-destructive/5" : "border-success/50 bg-success/5"}`}>
+                        <CardContent className="pt-6 text-sm whitespace-pre-wrap leading-relaxed">
+                          {feedback}
+                        </CardContent>
+                      </Card>
+                    </section>
+                  )}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            <TabsContent value="editor" className="flex-1 overflow-hidden m-0 p-0">
+              <div className="h-full flex flex-col bg-background">
+                <div className="px-4 py-2 border-b bg-muted/10 flex items-center justify-between shrink-0">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">v1.9.8 | Moble Optimized</span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-[10px] text-muted-foreground italic">Foco total na escrita.</span>
+                  </div>
+                </div>
+                <div className="flex-1 relative flex flex-col overflow-hidden">
+                  <Textarea
+                    className={`flex-1 resize-none border-none focus-visible:ring-0 p-6 font-serif text-[16px] leading-loose bg-[#09090b] text-[#FFFFFF] placeholder:text-[#FFFFFF]/50 min-h-[300px]`}
+                    placeholder="Comece a redigir sua peça aqui..."
+                    value={textoAluno}
+                    onChange={(e) => setTextoAluno(e.target.value)}
+                  />
+                  
+                  {/* FOOTER DO EDITOR: CONTADOR v1.9.8 COMPACTO */}
+                  <div className="p-3 border-t-2 border-primary/20 bg-[#09090b] flex items-center justify-between shrink-0">
+                    <div className={`flex items-center gap-2 text-xs font-bold transition-colors ${linhasCount > 150 ? "text-destructive animate-pulse" : "text-muted-foreground"}`}>
+                      L: {linhasCount} / 150
+                    </div>
+                    <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
+                      Auto-save ON
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <ResizablePanelGroup direction="horizontal">
+            {/* LADO ESQUERDO: ENUNCIADO E FEEDBACK (Só visível se não estiver no modo foco) */}
+            {!isFocusMode && (
+              <>
+                <ResizablePanel defaultSize={40} minSize={30}>
+                  <div className="h-full flex flex-col border-r">
+                    <ScrollArea className="flex-1">
+                      <div className="p-6 space-y-6">
+                        <section>
+                          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
+                            <Info className="h-4 w-4" /> Enunciado do Caso Prático
                           </h3>
-                          <Card className={`border-2 ${feedback.includes("REPROVADO") ? "border-destructive/50 bg-destructive/5" : "border-success/50 bg-success/5"}`}>
-                            <CardContent className="pt-6 text-sm whitespace-pre-wrap leading-relaxed">
-                              {feedback}
+                          <Card className="bg-muted/30 border-dashed">
+                            <CardContent className="pt-6 text-sm leading-relaxed">
+                              {CASOS_PRATICOS[materia] || "Escolha uma matéria para visualizar o caso."}
                             </CardContent>
                           </Card>
                         </section>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </div>
-              </ResizablePanel>
-              <ResizableHandle withHandle />
-            </>
-          )}
 
-          {/* LADO DIREITO: EDITOR */}
-          <ResizablePanel defaultSize={isFocusMode ? 100 : 60} minSize={40}>
-            <div className={`h-full flex flex-col bg-background ${isFocusMode ? "max-w-4xl mx-auto shadow-2xl border-x" : ""}`}>
-              <div className="px-4 py-2 border-b bg-muted/10 flex items-center justify-between shrink-0">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Editor de Peça Processual - v1.9.6</span>
-                <div className="flex items-center gap-4">
-                  <span className="text-[10px] text-muted-foreground italic hidden sm:inline">Use parágrafos claros e fundamente no Direito.</span>
-                  {!isFocusMode && (
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={toggleFocusMode}>
-                      <Maximize2 className="h-4 w-4" />
-                    </Button>
-                  )}
+                        {feedback && (
+                          <section className="animate-in fade-in slide-in-from-left-4 duration-500">
+                            <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4" /> Laudo do Inspetor Geral
+                            </h3>
+                            <Card className={`border-2 ${feedback.includes("REPROVADO") ? "border-destructive/50 bg-destructive/5" : "border-success/50 bg-success/5"}`}>
+                              <CardContent className="pt-6 text-sm whitespace-pre-wrap leading-relaxed">
+                                {feedback}
+                              </CardContent>
+                            </Card>
+                          </section>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </ResizablePanel>
+                <ResizableHandle withHandle />
+              </>
+            )}
+
+            {/* LADO DIREITO: EDITOR */}
+            <ResizablePanel defaultSize={isFocusMode ? 100 : 60} minSize={40}>
+              <div className={`h-full flex flex-col bg-background ${isFocusMode ? "max-w-4xl mx-auto shadow-2xl border-x" : ""}`}>
+                <div className="px-4 py-2 border-b bg-muted/10 flex items-center justify-between shrink-0">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Editor de Peça Processual - v1.9.8</span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-[10px] text-muted-foreground italic hidden sm:inline">Use parágrafos claros e fundamente no Direito.</span>
+                    {!isFocusMode && (
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={toggleFocusMode}>
+                        <Maximize2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1 relative flex flex-col overflow-hidden">
+                  <Textarea
+                    className={`flex-1 resize-none border-none focus-visible:ring-0 p-8 md:p-12 font-serif text-lg leading-loose bg-[#09090b] text-[#FFFFFF] placeholder:text-[#FFFFFF]/50`}
+                    placeholder="Comece a redigir sua peça aqui... Ex: EXCELENTÍSSIMO SENHOR DOUTOR JUIZ..."
+                    value={textoAluno}
+                    onChange={(e) => setTextoAluno(e.target.value)}
+                  />
+                  
+                  {/* FOOTER DO EDITOR: CONTADOR v1.9.8 */}
+                  <div className="p-3 border-t-2 border-primary/20 bg-[#09090b] flex items-center justify-between shrink-0">
+                    <div className={`flex items-center gap-2 text-xs font-bold transition-colors ${linhasCount > 150 ? "text-destructive animate-pulse" : "text-muted-foreground"}`}>
+                      <AlertTriangle className={`h-3.5 w-3.5 ${linhasCount > 150 ? "opacity-100" : "opacity-0"}`} />
+                      LINHA: {linhasCount} / 150
+                      {linhasCount > 150 && <span className="ml-1 uppercase">(Limite OAB Excedido)</span>}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
+                      Salvamento automático ativo
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex-1 relative flex flex-col overflow-hidden">
-                <Textarea
-                  className={`flex-1 resize-none border-none focus-visible:ring-0 p-8 md:p-12 font-serif text-lg leading-loose bg-[#09090b] text-[#FFFFFF] placeholder:text-[#FFFFFF]/50`}
-                  placeholder="Comece a redigir sua peça aqui... Ex: EXCELENTÍSSIMO SENHOR DOUTOR JUIZ..."
-                  value={textoAluno}
-                  onChange={(e) => setTextoAluno(e.target.value)}
-                />
-                
-                {/* FOOTER DO EDITOR: CONTADOR v1.9.5 */}
-                <div className="p-3 border-t-2 border-primary/20 bg-[#09090b] flex items-center justify-between shrink-0">
-                  <div className={`flex items-center gap-2 text-xs font-bold transition-colors ${linhasCount > 150 ? "text-destructive animate-pulse" : "text-muted-foreground"}`}>
-                    <AlertTriangle className={`h-3.5 w-3.5 ${linhasCount > 150 ? "opacity-100" : "opacity-0"}`} />
-                    LINHA: {linhasCount} / 150
-                    {linhasCount > 150 && <span className="ml-1 uppercase">(Limite OAB Excedido)</span>}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
-                    Salvamento automático ativo
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        )}
       </div>
     </div>
   );
