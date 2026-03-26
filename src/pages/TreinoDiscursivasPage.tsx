@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, PenTool, Send, Sparkles, CheckCircle2, AlertTriangle, RefreshCw } from "lucide-react";
+import { Loader2, PenTool, Send, Sparkles, CheckCircle2, AlertTriangle, RefreshCw, Clock, Pause, Play, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/use-profile";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -89,6 +89,61 @@ export default function TreinoDiscursivasPage() {
   const [feedbacks, setFeedbacks] = useState<(string | null)[]>([null, null, null, null]);
   const [corrigindo, setCorrigindo] = useState<boolean[]>([false, false, false, false]);
   const [gerandoQuestoes, setGerandoQuestoes] = useState(false);
+
+  // v1.9.5: Cronômetro
+  const [seconds, setSeconds] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Restaurar auto-save local ao carregar
+    const savedResponses = localStorage.getItem(`draft_discursivas_${materia}`);
+    if (savedResponses) {
+      try {
+        const parsed = JSON.parse(savedResponses);
+        if (Array.isArray(parsed)) setRespostas(parsed);
+      } catch (e) {
+        console.error("Erro ao restaurar rascunho", e);
+      }
+    }
+  }, [materia]);
+
+  // Cronômetro Logic
+  useEffect(() => {
+    if (isActive) {
+      timerRef.current = setInterval(() => {
+        setSeconds((prev) => prev + 1);
+      }, 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isActive]);
+
+  // Auto-save Logic (30 seconds)
+  useEffect(() => {
+    const autoSaveInterval = setInterval(() => {
+      if (respostas.some(r => r.trim())) {
+        localStorage.setItem(`draft_discursivas_${materia}`, JSON.stringify(respostas));
+      }
+    }, 30000);
+
+    return () => clearInterval(autoSaveInterval);
+  }, [respostas, materia]);
+
+  const formatTime = (totalSeconds: number) => {
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleResetTimer = () => {
+    setIsActive(false);
+    setSeconds(0);
+  };
 
   useEffect(() => {
     setQuestoes(QUESTOES_FIXAS[materia] || []);
@@ -332,6 +387,21 @@ Retorne o feedback formatado:
           <h1 className="text-lg font-bold flex items-center gap-2">
             <PenTool className="h-5 w-5 text-primary" /> Treino de Discursivas
           </h1>
+          
+          {/* TIMER COMPONENT v1.9.5 */}
+          <div className="flex items-center gap-3 px-4 py-1.5 bg-muted/40 rounded-full border border-border/50">
+            <Clock className={`h-4 w-4 ${isActive ? "text-primary animate-pulse" : "text-muted-foreground"}`} />
+            <span className="font-mono font-bold text-sm tracking-tighter w-16">{formatTime(seconds)}</span>
+            <div className="flex items-center gap-1 border-l ml-1 pl-2">
+              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsActive(!isActive)}>
+                {isActive ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3 fill-current" />}
+              </Button>
+              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleResetTimer}>
+                <RotateCcw className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+
           <div className="flex items-center gap-2">
             <Select value={materia} onValueChange={handleMateriaChange}>
               <SelectTrigger className="w-[200px] bg-white text-black font-bold border-2 border-primary/20">

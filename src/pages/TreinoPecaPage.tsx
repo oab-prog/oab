@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ShieldAlert, Sparkles, AlertTriangle, CheckCircle2, Info } from "lucide-react";
+import { Loader2, ShieldAlert, Sparkles, AlertTriangle, CheckCircle2, Info, Maximize2, Minimize2, Play, Pause, RotateCcw, Eye, Clock } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useProfile } from "@/hooks/use-profile";
 
@@ -56,6 +56,92 @@ export default function TreinoPecaPage() {
   const [corrigindo, setCorrigindo] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // v1.9.5: Cronômetro
+  const [seconds, setSeconds] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // v1.9.5: Modo Foco
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [showEnunciadoFloating, setShowEnunciadoFloating] = useState(false);
+
+  // v1.9.5: Lógica de Linhas OAB (estimada)
+  const [linhasCount, setLinhasCount] = useState(0);
+
+  useEffect(() => {
+    // Restaurar auto-save local ao carregar
+    const savedDraft = localStorage.getItem(`draft_peca_${materia}`);
+    if (savedDraft) {
+      setTextoAluno(savedDraft);
+      toast({
+        title: "Rascunho Restaurado",
+        description: "Seu trabalho anterior foi carregado automaticamente.",
+      });
+    }
+  }, [materia]);
+
+  // Cronômetro Logic
+  useEffect(() => {
+    if (isActive) {
+      timerRef.current = setInterval(() => {
+        setSeconds((prev) => prev + 1);
+      }, 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isActive]);
+
+  const formatTime = (totalSeconds: number) => {
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleResetTimer = () => {
+    setIsActive(false);
+    setSeconds(0);
+  };
+
+  // Auto-save Logic (30 seconds)
+  useEffect(() => {
+    const autoSaveInterval = setInterval(() => {
+      if (textoAluno.trim()) {
+        localStorage.setItem(`draft_peca_${materia}`, textoAluno);
+        // Toast discreto removido para não poluir, ou usar algo rápido
+      }
+    }, 30000);
+
+    return () => clearInterval(autoSaveInterval);
+  }, [textoAluno, materia]);
+
+  // Contador de Linhas (Simulação Jurídica)
+  useEffect(() => {
+    // Estimativa OAB: ~70 caracteres por linha no papel padrão OAB
+    // Ou simplesmente contar quebras de linha + wrap
+    const lines = textoAluno.split("\n");
+    let count = 0;
+    lines.forEach(line => {
+      // Se a linha for vazia mas existir, conta como 1
+      // Se for muito longa, conta como múltiplas linhas (wrap)
+      const wraps = Math.max(1, Math.ceil(line.length / 80)); 
+      count += wraps;
+    });
+    setLinhasCount(count);
+  }, [textoAluno]);
+
+  const toggleFocusMode = () => {
+    setIsFocusMode(!isFocusMode);
+    if (!isFocusMode) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  };
 
   const handleCorrigir = async () => {
     if (!textoAluno.trim()) {
@@ -212,14 +298,17 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
   }
 
   return (
-    <div className="h-[calc(100vh-3.5rem)] flex flex-col">
+    <div className={`h-[calc(100vh-3.5rem)] flex flex-col ${isFocusMode ? "fixed inset-0 z-50 bg-background h-screen" : ""}`}>
+      {/* CABEÇALHO COM CRONÔMETRO v1.9.5 */}
       <div className="border-b bg-card p-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
-          <h1 className="text-lg font-bold flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" /> JurisVision 2ª Fase
-          </h1>
+          {!isFocusMode && (
+            <h1 className="text-lg font-bold flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" /> JurisVision 2ª Fase
+            </h1>
+          )}
           <Select value={materia} onValueChange={handleMateriaChange}>
-            <SelectTrigger className="w-[220px]">
+            <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Selecione a matéria" />
             </SelectTrigger>
             <SelectContent>
@@ -228,67 +317,139 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
               ))}
             </SelectContent>
           </Select>
+
+          {/* TIMER COMPONENT */}
+          <div className="flex items-center gap-3 px-4 py-1.5 bg-muted/40 rounded-full border border-border/50">
+            <Clock className={`h-4 w-4 ${isActive ? "text-primary animate-pulse" : "text-muted-foreground"}`} />
+            <span className="font-mono font-bold text-sm tracking-tighter w-16">{formatTime(seconds)}</span>
+            <div className="flex items-center gap-1 border-l ml-1 pl-2">
+              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setIsActive(!isActive)}>
+                {isActive ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3 fill-current" />}
+              </Button>
+              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleResetTimer}>
+                <RotateCcw className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
         </div>
-        <Button 
-          onClick={handleCorrigir} 
-          disabled={corrigindo}
-          className="bg-primary hover:bg-primary/90 text-white font-bold gap-2"
-        >
-          {corrigindo ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldAlert className="h-4 w-4" />}
-          CORRIGIR PEÇA COM INSPETOR
-        </Button>
+        
+        <div className="flex items-center gap-3">
+          {isFocusMode && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="font-bold gap-2" 
+              onClick={() => setShowEnunciadoFloating(!showEnunciadoFloating)}
+            >
+              <Eye className="h-4 w-4" /> {showEnunciadoFloating ? "OCULTAR" : "VER"} ENUNCIADO
+            </Button>
+          )}
+          <Button 
+            onClick={handleCorrigir} 
+            disabled={corrigindo}
+            className="bg-primary hover:bg-primary/90 text-white font-bold gap-2"
+          >
+            {corrigindo ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldAlert className="h-4 w-4" />}
+            CORRIGIR PEÇA COM INSPETOR
+          </Button>
+          {isFocusMode && (
+            <Button variant="ghost" size="icon" onClick={toggleFocusMode}>
+              <Minimize2 className="h-5 w-5" />
+            </Button>
+          )}
+        </div>
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
+        {/* Floating Enunciado in Focus Mode */}
+        {isFocusMode && showEnunciadoFloating && (
+          <div className="absolute left-8 top-8 z-50 w-1/3 max-h-[70vh] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <Card className="border-2 border-primary/20 bg-background/95 backdrop-blur-sm">
+              <CardHeader className="py-3 bg-muted/30">
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <Info className="h-4 w-4" /> ENUNCIADO DO CASO
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 text-sm leading-relaxed max-h-[50vh] overflow-y-auto">
+                {CASOS_PRATICOS[materia]}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         <ResizablePanelGroup direction="horizontal">
-          {/* LADO ESQUERDO: ENUNCIADO E FEEDBACK */}
-          <ResizablePanel defaultSize={40} minSize={30}>
-            <div className="h-full flex flex-col border-r">
-              <ScrollArea className="flex-1">
-                <div className="p-6 space-y-6">
-                  <section>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
-                      <Info className="h-4 w-4" /> Enunciado do Caso Prático
-                    </h3>
-                    <Card className="bg-muted/30 border-dashed">
-                      <CardContent className="pt-6 text-sm leading-relaxed">
-                        {CASOS_PRATICOS[materia] || "Escolha uma matéria para visualizar o caso."}
-                      </CardContent>
-                    </Card>
-                  </section>
+          {/* LADO ESQUERDO: ENUNCIADO E FEEDBACK (Só visível se não estiver no modo foco) */}
+          {!isFocusMode && (
+            <>
+              <ResizablePanel defaultSize={40} minSize={30}>
+                <div className="h-full flex flex-col border-r">
+                  <ScrollArea className="flex-1">
+                    <div className="p-6 space-y-6">
+                      <section>
+                        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
+                          <Info className="h-4 w-4" /> Enunciado do Caso Prático
+                        </h3>
+                        <Card className="bg-muted/30 border-dashed">
+                          <CardContent className="pt-6 text-sm leading-relaxed">
+                            {CASOS_PRATICOS[materia] || "Escolha uma matéria para visualizar o caso."}
+                          </CardContent>
+                        </Card>
+                      </section>
 
-                  {feedback && (
-                    <section className="animate-in fade-in slide-in-from-left-4 duration-500">
-                      <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4" /> Laudo do Inspetor Geral
-                      </h3>
-                      <Card className={`border-2 ${feedback.includes("REPROVADO") ? "border-destructive/50 bg-destructive/5" : "border-success/50 bg-success/5"}`}>
-                        <CardContent className="pt-6 text-sm whitespace-pre-wrap leading-relaxed">
-                          {feedback}
-                        </CardContent>
-                      </Card>
-                    </section>
-                  )}
+                      {feedback && (
+                        <section className="animate-in fade-in slide-in-from-left-4 duration-500">
+                          <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4" /> Laudo do Inspetor Geral
+                          </h3>
+                          <Card className={`border-2 ${feedback.includes("REPROVADO") ? "border-destructive/50 bg-destructive/5" : "border-success/50 bg-success/5"}`}>
+                            <CardContent className="pt-6 text-sm whitespace-pre-wrap leading-relaxed">
+                              {feedback}
+                            </CardContent>
+                          </Card>
+                        </section>
+                      )}
+                    </div>
+                  </ScrollArea>
                 </div>
-              </ScrollArea>
-            </div>
-          </ResizablePanel>
-
-          <ResizableHandle withHandle />
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+            </>
+          )}
 
           {/* LADO DIREITO: EDITOR */}
-          <ResizablePanel defaultSize={60} minSize={40}>
-            <div className="h-full flex flex-col bg-background">
-              <div className="p-4 border-b bg-muted/10 flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Editor de Peça Processual</span>
-                <span className="text-[10px] text-muted-foreground italic">Dica: Use parágrafos claros e fundamente no Direito.</span>
+          <ResizablePanel defaultSize={isFocusMode ? 100 : 60} minSize={40}>
+            <div className={`h-full flex flex-col bg-background ${isFocusMode ? "max-w-4xl mx-auto shadow-2xl border-x" : ""}`}>
+              <div className="px-4 py-2 border-b bg-muted/10 flex items-center justify-between shrink-0">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Editor de Peça Processual - v1.9.5</span>
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] text-muted-foreground italic hidden sm:inline">Use parágrafos claros e fundamente no Direito.</span>
+                  {!isFocusMode && (
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={toggleFocusMode}>
+                      <Maximize2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
-              <Textarea
-                className="flex-1 resize-none border-none focus-visible:ring-0 p-8 font-serif text-lg leading-loose"
-                placeholder="Comece a redigir sua peça aqui... Ex: EXCELENTÍSSIMO SENHOR DOUTOR JUIZ..."
-                value={textoAluno}
-                onChange={(e) => setTextoAluno(e.target.value)}
-              />
+              <div className="flex-1 relative flex flex-col overflow-hidden">
+                <Textarea
+                  className={`flex-1 resize-none border-none focus-visible:ring-0 p-8 md:p-12 font-serif text-lg leading-loose bg-white/50`}
+                  placeholder="Comece a redigir sua peça aqui... Ex: EXCELENTÍSSIMO SENHOR DOUTOR JUIZ..."
+                  value={textoAluno}
+                  onChange={(e) => setTextoAluno(e.target.value)}
+                />
+                
+                {/* FOOTER DO EDITOR: CONTADOR v1.9.5 */}
+                <div className="p-3 border-t bg-muted/5 flex items-center justify-between shrink-0">
+                  <div className={`flex items-center gap-2 text-xs font-bold transition-colors ${linhasCount > 150 ? "text-destructive animate-pulse" : "text-muted-foreground"}`}>
+                    <AlertTriangle className={`h-3.5 w-3.5 ${linhasCount > 150 ? "opacity-100" : "opacity-0"}`} />
+                    LINHA: {linhasCount} / 150
+                    {linhasCount > 150 && <span className="ml-1 uppercase">(Limite OAB Excedido)</span>}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
+                    Salvamento automático ativo
+                  </div>
+                </div>
+              </div>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
