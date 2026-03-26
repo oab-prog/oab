@@ -28,7 +28,7 @@ def analisar_lote_ia(caminhos_txt, fatos, callback_progresso, callback_sucesso, 
                 if "ACTIVE" in str(f_info.state).upper(): break
                 time.sleep(2)
             prompt = f"DIRECIONAMENTO: {fatos}\n\nAnalise este volume Constitucional. Foque em: Mandado de Segurança (7x), ADI (7x), Ação Popular (5x). OBRIGATÓRIO citar fls. TRAVA LEGISLATIVA: CF/88. NÃO INVENTE DADOS."
-            response = client.models.generate_content(model='gemini-2.0-flash', contents=[types.Part.from_uri(file_uri=f_info.uri, mime_type='text/plain'), prompt], config=types.GenerateContentConfig(temperature=0.0))
+            response = client.models.generate_content(model='gemini-2.5-flash', contents=[types.Part.from_uri(file_uri=f_info.uri, mime_type='text/plain'), prompt], config=types.GenerateContentConfig(temperature=0.0))
             resumos_volumes.append(f"--- ACHADOS CONSTITUCIONAIS VOLUME {idx+1} ---\n{response.text.strip()}")
             client.files.delete(name=gemini_file.name)
         
@@ -40,7 +40,7 @@ def analisar_lote_ia(caminhos_txt, fatos, callback_progresso, callback_sucesso, 
         3. OBRIGATÓRIO fls.
         """
         prompt_m = f"DIRECIONAMENTO: {fatos}\n\n--- DADOS ---\n" + "\n".join(resumos_volumes) + "\n\nGere o JSON."
-        resp_f = client.models.generate_content(model='gemini-2.0-flash', contents=[prompt_m], config=types.GenerateContentConfig(system_instruction=instrucao, temperature=0.0, response_mime_type="application/json"))
+        resp_f = client.models.generate_content(model='gemini-2.5-flash', contents=[prompt_m], config=types.GenerateContentConfig(system_instruction=instrucao, temperature=0.0, response_mime_type="application/json"))
         callback_sucesso(aplicar_escudo_no_json(json.loads(resp_f.text.strip())))
     except Exception as e: callback_erro(str(e))
 

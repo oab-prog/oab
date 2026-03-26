@@ -49,7 +49,7 @@ def analisar_lote_ia(caminhos_txt: List[str], fatos: str, callback_progresso: An
             conteudo_txt = types.Part.from_uri(file_uri=f_info.uri, mime_type='text/plain')
             prompt_detetive = f"DIRECIONAMENTO DA ESTRATÉGIA:\n{fatos}\n\nAnalise este volume Administrativo. Foque em: licitações, processos disciplinares, atos de improbidade e responsabilidade civil do Estado. OBRIGATÓRIO fls. RIGOR: Apelação (7x), Mandado de Segurança (5x), Contestação (3x). NÃO INVENTE."
             config_detetive = types.GenerateContentConfig(temperature=0.0)
-            response_detetive = client.models.generate_content(model='gemini-2.0-flash', contents=[conteudo_txt, prompt_detetive], config=config_detetive)
+            response_detetive = client.models.generate_content(model='gemini-2.5-flash', contents=[conteudo_txt, prompt_detetive], config=config_detetive)
             resumos_volumes.append(f"--- ACHADOS ADMINISTRATIVOS DO VOLUME {vol_num} ---\n{response_detetive.text.strip()}\n")
             client.files.delete(name=gemini_file.name)
 
@@ -63,7 +63,7 @@ def analisar_lote_ia(caminhos_txt: List[str], fatos: str, callback_progresso: An
         """
         prompt_mestre = f"DIRECIONAMENTO:\n{fatos}\n\n--- DADOS ---\n{texto_consolidado}\n\nGere o JSON."
         config_mestre = types.GenerateContentConfig(system_instruction=instrucao_sistema_mestre, temperature=0.0, response_mime_type="application/json")
-        response_final = client.models.generate_content(model='gemini-2.0-flash', contents=[prompt_mestre], config=config_mestre)
+        response_final = client.models.generate_content(model='gemini-2.5-flash', contents=[prompt_mestre], config=config_mestre)
         callback_sucesso(aplicar_escudo_no_json(json.loads(response_final.text.strip())))
     except Exception as e: callback_erro(str(e))
 

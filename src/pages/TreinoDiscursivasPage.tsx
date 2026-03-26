@@ -106,6 +106,7 @@ export default function TreinoDiscursivasPage() {
     setGerandoQuestoes(true);
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
       const materiaLabel = MATERIAS.find(m => m.id === materia)?.label;
       const prompt = `Você é um membro da banca examinadora da OAB (FGV). 
 Gere 4 questões discursivas inéditas no padrão FGV OAB especificamente sobre o tema [${tema === "Sorteio Aleatório" ? "aleatório/maior recorrência" : tema}] da matéria [${materiaLabel}]. 
@@ -113,7 +114,7 @@ Cada questão deve obrigatoriamente ter um item A e um item B.
 A resposta esperada deve conter a fundamentação legal precisa.
 Retorne as questões começando cada uma com "Questão X: ".`;
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -164,6 +165,7 @@ Retorne as questões começando cada uma com "Questão X: ".`;
 
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
       const instrucao = `Você é o Corretor Especialista do JurisVision (Banca FGV). 
 Sua missão é corrigir uma questão discursiva que possui itens A e B.
 Avalie a resposta do aluno com base no espelho de correção da OAB.
@@ -184,7 +186,7 @@ RESPOSTA DO ALUNO: ${respostas[index]}
 
 Emita a correção agora.`;
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

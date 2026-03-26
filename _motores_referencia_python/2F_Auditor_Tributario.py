@@ -59,7 +59,7 @@ def analisar_lote_ia(caminhos_txt: List[str], fatos: str, callback_progresso: An
             
             prompt_detetive = f"DIRECIONAMENTO DA ESTRATÉGIA:\n{fatos}\n\nLeia este volume Tributário. Extraia lançamentos, notificações, CDAs, datas de prescrição/decadência e fatos geradores. É OBRIGATÓRIO citar as fls. de cada achado. RIGOR MÁXIMO para Mandado de Segurança (8x), Agravo (7x), Apelação (7x) e Repetição de Indébito (6x). NÃO INVENTE DADOS."
             config_detetive = types.GenerateContentConfig(temperature=0.0, safety_settings=filtros_seguranca)
-            response_detetive = client.models.generate_content(model='gemini-2.0-flash', contents=[conteudo_txt, prompt_detetive], config=config_detetive)
+            response_detetive = client.models.generate_content(model='gemini-2.5-flash', contents=[conteudo_txt, prompt_detetive], config=config_detetive)
             
             resumos_volumes.append(f"--- ACHADOS TRIBUTÁRIOS DO VOLUME {vol_num} ---\n{response_detetive.text.strip()}\n")
             client.files.delete(name=gemini_file.name)
@@ -90,7 +90,7 @@ def analisar_lote_ia(caminhos_txt: List[str], fatos: str, callback_progresso: An
             safety_settings=filtros_seguranca
         )
 
-        response_final = client.models.generate_content(model='gemini-2.0-flash', contents=[prompt_mestre], config=config_mestre)
+        response_final = client.models.generate_content(model='gemini-2.5-flash', contents=[prompt_mestre], config=config_mestre)
 
         if not hasattr(response_final, 'text') or not response_final.text: raise Exception("Recusado pelos filtros.")
 
