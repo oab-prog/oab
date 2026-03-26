@@ -30,11 +30,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full bg-background transition-all duration-300 ease-in-out">
         <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-12 flex items-center justify-between border-b border-border px-4 shrink-0">
-            <SidebarTrigger />
+        <div className="flex-1 flex flex-col min-w-0 relative transition-all duration-300 ease-in-out">
+          <header className="h-14 flex items-center justify-between border-b border-border px-4 shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-30">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger className="z-50 hover:bg-accent transition-colors" />
+            </div>
             
             <div className="flex items-center gap-2">
               {user ? (

@@ -45,9 +45,9 @@ export function AppSidebar() {
   const canAccess2aFase = isAssinante2aFase;
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border bg-[#020617] !w-[280px]">
+    <Sidebar collapsible="icon" className="border-r border-border bg-[#020617]">
       <SidebarContent className="pt-2 overflow-y-auto">
-        <div className="px-4 mb-4">
+        <div className="px-4 mb-4 mt-2">
           {!collapsed ? (
             <div className="flex items-center gap-3">
               <img 
