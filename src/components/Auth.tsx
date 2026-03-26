@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,11 +90,9 @@ export function Auth({ onToggle }: { onToggle?: () => void }) {
                   className="h-20 w-20 mx-auto object-contain mb-6 drop-shadow-sm"
                 />
                 <h2 className="text-2xl font-bold tracking-tight">Acesse sua Área Pro</h2>
-                <div className="bg-slate-900 p-4 rounded-xl border border-white/10 shadow-2xl my-6">
-                  <h3 className="text-sm md:text-base font-black text-white text-center uppercase tracking-tight leading-tight">
-                    ENTRE EM CONTATO AGORA E DESCUBRA O SEGREDO DA APROVAÇÃO NA OAB GUIADA POR DADOS!
-                  </h3>
-                </div>
+                <h3 className="text-sm md:text-base font-black text-white text-center uppercase tracking-tight leading-tight my-6 px-4 drop-shadow-sm">
+                  ENTRE EM CONTATO AGORA E DESCUBRA O SEGREDO DA APROVAÇÃO NA OAB GUIADA POR DADOS!
+                </h3>
               </div>
 
               <Card className="border-none shadow-none bg-transparent">
@@ -138,6 +137,13 @@ export function Auth({ onToggle }: { onToggle?: () => void }) {
                     >
                       Esqueceu sua senha? Clique aqui
                     </button>
+                    <p className="mt-6 text-[10px] text-muted-foreground text-center leading-relaxed max-w-[280px] mx-auto">
+                      Ao clicar em entrar, você concorda com nossos{" "}
+                      <Link to="/termos" className="underline hover:text-primary transition-colors">Termos de Uso</Link>{" "}
+                      e{" "}
+                      <Link to="/privacidade" className="underline hover:text-primary transition-colors">Política de Privacidade</Link>. 
+                      O JurisVision utiliza tecnologia de criptografia de ponta para proteger seu progresso.
+                    </p>
                   </CardFooter>
                 </form>
               </Card>
@@ -190,7 +196,7 @@ export function Auth({ onToggle }: { onToggle?: () => void }) {
               themis.ma.consultoria@gmail.com
             </a>
             <p className="text-[10px] text-muted-foreground mt-4 opacity-50 font-bold uppercase tracking-widest">
-              v1.2.0 — OFICIAL
+              v1.2.1 — OFICIAL
             </p>
           </div>
         </div>

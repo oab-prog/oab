@@ -11,6 +11,8 @@ import RadarPage from "@/pages/RadarPage";
 import PredicaoPage from "@/pages/PredicaoPage";
 import EticaFlashcards from "@/pages/EticaFlashcards";
 import DicionarioTeses from "@/pages/DicionarioTeses"; // <-- IMPORTAÇÃO DO DICIONÁRIO
+import TermsPage from "@/pages/TermsPage";
+import PrivacyPage from "@/pages/PrivacyPage";
 import NotFound from "./pages/NotFound";
 
 import { AuthGuard } from "@/components/AuthGuard";
@@ -40,20 +42,26 @@ const App = () => (
       <Sonner />
       <WhatsAppFAB />
       <HashRouter>
-        <AuthGuard>
-          <AppLayout>
-            <Routes>
-              <Route path="/" element={<Index />} /> 
-              <Route path="/simulado" element={<SimuladoPage />} />
-              <Route path="/buscador" element={<BuscadorPage />} />
-              <Route path="/radar" element={<RadarPage />} />
-              <Route path="/predicao" element={<PredicaoPage />} />
-              <Route path="/etica" element={<EticaFlashcards />} />
-              <Route path="/teses" element={<DicionarioTeses />} /> {/* <-- NOVA ROTA DE TESES */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AppLayout>
-        </AuthGuard>
+        <Routes>
+          <Route path="/termos" element={<TermsPage />} />
+          <Route path="/privacidade" element={<PrivacyPage />} />
+          <Route path="/*" element={
+            <AuthGuard>
+              <AppLayout>
+                <Routes>
+                  <Route path="/" element={<Index />} /> 
+                  <Route path="/simulado" element={<SimuladoPage />} />
+                  <Route path="/buscador" element={<BuscadorPage />} />
+                  <Route path="/radar" element={<RadarPage />} />
+                  <Route path="/predicao" element={<PredicaoPage />} />
+                  <Route path="/etica" element={<EticaFlashcards />} />
+                  <Route path="/teses" element={<DicionarioTeses />} /> {/* <-- NOVA ROTA DE TESES */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </AppLayout>
+            </AuthGuard>
+          } />
+        </Routes>
       </HashRouter>
     </TooltipProvider>
   </QueryClientProvider>
