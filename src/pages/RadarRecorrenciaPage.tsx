@@ -5,7 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { AlertTriangle, TrendingUp, BookOpen, Target } from 'lucide-react';
+import { AlertTriangle, TrendingUp, BookOpen, Target, FileText, Download, CheckCircle2 } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
+import { bancoCompleto } from '@/data/questoes';
+import { exportarQuestoesPDF } from '@/lib/pdf-export';
 
 const materiaData = {
   tributario: {
@@ -143,12 +147,28 @@ const getProgressColor = (value: number) => {
 };
 
 const RadarRecorrenciaPage = () => {
+  const getQuestoesPorTema = (temaNome: string) => {
+    return bancoCompleto.filter(q => 
+      q.tema.toLowerCase().includes(temaNome.toLowerCase())
+    ).slice(0, 5);
+  };
+
+  const handleDownloadPDF = (nomeMateria: string, temas: any[]) => {
+    const allQuestoes = temas.flatMap(t => getQuestoesPorTema(t.name));
+    const uniqueQuestoes = Array.from(new Map(allQuestoes.map(q => [q.id, q])).values());
+    if (uniqueQuestoes.length === 0) {
+        alert("Nenhuma questão encontrada para os temas desta matéria.");
+        return;
+    }
+    exportarQuestoesPDF(uniqueQuestoes, `Caderno de Questões - ${nomeMateria}`, `questoes_${nomeMateria.toLowerCase().replace(/\s+/g, '_')}.pdf`);
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-8 bg-[#020617] min-h-screen text-white">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-zinc-800 pb-6">
         <div>
           <h1 className="text-4xl font-black tracking-tight text-white flex items-center gap-2">
-            📊 Radar de Recorrência <Badge variant="secondary" className="ml-2 bg-zinc-800 text-zinc-300 border-none">v1.7.0</Badge>
+            📊 Radar de Recorrência <Badge variant="secondary" className="ml-2 bg-zinc-800 text-zinc-300 border-none">v1.9.9</Badge>
           </h1>
           <p className="text-zinc-400 mt-2 font-medium">
             Inteligência Estatística Baseada na Recorrência Real da FGV/OAB
@@ -290,6 +310,96 @@ const RadarRecorrenciaPage = () => {
                     <p className="text-xs text-[#FFFFFF] font-medium">Domine {data.temas[0].name} para as questões discursivas.</p>
                   </div>
                </div>
+            </div>
+
+            <div className="space-y-6 pt-6 border-t border-zinc-800">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <h3 className="text-2xl font-bold flex items-center gap-2 text-white">
+                        <FileText className="text-blue-500" /> Questões Clones & Base de Treino
+                    </h3>
+                    <Button 
+                        onClick={() => handleDownloadPDF(data.nome, data.temas)}
+                        className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 w-full md:w-auto shadow-lg shadow-green-900/20"
+                    >
+                        <Download className="h-4 w-4" /> Baixar Caderno de Questões (PDF)
+                    </Button>
+                </div>
+
+                <Tabs defaultValue={data.temas[0].name} className="w-full">
+                    <TabsList className="grid grid-cols-2 md:flex md:flex-wrap h-auto bg-zinc-950 p-1 border border-zinc-800 rounded-lg overflow-hidden">
+                        {data.temas.map((tema) => (
+                            <TabsTrigger 
+                                key={tema.name} 
+                                value={tema.name}
+                                className="text-[10px] md:text-xs py-2 data-[state=active]:bg-zinc-800"
+                            >
+                                {tema.name}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                    {data.temas.map((tema) => {
+                        const questoes = getQuestoesPorTema(tema.name);
+                        return (
+                            <TabsContent key={tema.name} value={tema.name} className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
+                                {questoes.length > 0 ? (
+                                    <Accordion type="single" collapsible className="w-full space-y-3">
+                                        {questoes.map((q) => (
+                                            <AccordionItem key={q.id} value={`item-${q.id}`} className="border border-zinc-800 bg-zinc-900/40 rounded-xl px-4 overflow-hidden">
+                                                <AccordionTrigger className="hover:no-underline text-left py-4">
+                                                    <div className="flex flex-col md:flex-row md:items-center justify-between w-full pr-4 gap-2">
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-blue-400 text-[10px] uppercase font-black tracking-widest">Questão #{q.id} • FGV OficiaL</span>
+                                                            <span className="text-sm font-bold text-zinc-100 line-clamp-1">{q.pergunta}</span>
+                                                        </div>
+                                                        <Badge variant="outline" className="text-[9px] border-zinc-700 text-zinc-400 whitespace-nowrap">
+                                                            Ver Resposta & Gabarito
+                                                        </Badge>
+                                                    </div>
+                                                </AccordionTrigger>
+                                                <AccordionContent className="text-zinc-300 space-y-6 pb-6">
+                                                    <div className="p-4 bg-zinc-950/50 rounded-lg border border-zinc-800">
+                                                        <p className="text-sm leading-relaxed font-medium text-zinc-200">{q.pergunta}</p>
+                                                    </div>
+                                                    
+                                                    <div className="grid gap-3">
+                                                        {q.opcoes.map((op, opIdx) => (
+                                                            <div key={opIdx} className="p-3 rounded-lg bg-zinc-900/60 border border-zinc-800 text-xs flex gap-3">
+                                                                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-500">
+                                                                    {String.fromCharCode(65 + opIdx)}
+                                                                </span>
+                                                                <span className="py-0.5">{op}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+
+                                                    <div className="p-5 bg-green-500/5 rounded-xl border border-green-500/20">
+                                                        <h5 className="text-green-400 font-black text-xs uppercase tracking-widest flex items-center gap-2 mb-3">
+                                                            <CheckCircle2 className="h-4 w-4" /> Gabarito Comentado JurisVision
+                                                        </h5>
+                                                        <div className="space-y-3">
+                                                            <div className="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-bold">
+                                                                Alternativa Correta: {q.correta}
+                                                            </div>
+                                                            <p className="text-xs leading-relaxed text-zinc-400 italic">
+                                                                {q.comentario || "Comentário indisponível para esta questão no momento."}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        ))}
+                                    </Accordion>
+                                ) : (
+                                    <div className="py-12 text-center border border-dashed border-zinc-800 rounded-2xl bg-zinc-900/20">
+                                        <BookOpen className="h-10 w-10 text-zinc-700 mx-auto mb-3" />
+                                        <p className="text-zinc-500 font-medium">Nenhuma questão histórica encontrada para "{tema.name}".</p>
+                                        <p className="text-zinc-600 text-xs mt-1">Nossa base está sendo atualizada com novos temas FGV.</p>
+                                    </div>
+                                )}
+                            </TabsContent>
+                        );
+                    })}
+                </Tabs>
             </div>
           </TabsContent>
         ))}
