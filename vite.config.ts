@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/oab/", // <-- OLHA A LINHA NOVA AQUI!
+  base: "/oab-main/", // Nome do repositório no GitHub Pages
   server: {
     host: "::",
     port: 8080,

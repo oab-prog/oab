@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { bancoCompleto, bancoEstrategico, missoes } from "@/data/questoes";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { Crosshair, BookOpen, BarChart3, Scale } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -40,12 +40,12 @@ export default function HomePage() {
               <p className="text-xs font-semibold tracking-widest uppercase text-primary mb-2">Missão do Dia</p>
               <p className="text-foreground text-sm md:text-base leading-relaxed">{missaoHoje}</p>
             </div>
-            <button
-              onClick={() => navigate("/simulado-primeira-fase")}
+            <Link
+              to="/simulado-primeira-fase"
               className="whitespace-nowrap bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors"
             >
               Começar Agora
-            </button>
+            </Link>
           </div>
         </CardContent>
       </Card>
