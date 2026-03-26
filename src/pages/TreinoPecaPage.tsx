@@ -125,8 +125,12 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
         };
 
         url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        console.log('URL de Destino:', url);
-        console.log('Payload enviado:', JSON.stringify(requestBody));
+        
+        if (!apiKey) {
+          alert('Configuração Pendente: Insira a nova API Key');
+          setCorrigindo(false);
+          return;
+        }
       } catch (error) {
         console.error('Erro na preparação do envio:', error);
         throw error;
@@ -148,11 +152,14 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
         });
       }
 
+      if (!response.ok) {
+        throw new Error("Conexão em manutenção. Por favor, tente em instantes.");
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('Erro detalhado da API Gemini:', data);
-        throw new Error(data.error?.message || "Erro na resposta da API Gemini");
+        throw new Error(data.error?.message || "Conexão em manutenção. Por favor, tente em instantes.");
       }
 
       let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -165,11 +172,11 @@ Seja frio, direto e rigoroso. Não use introduções cordiais.`;
       } else {
         throw new Error("Falha ao obter resposta da IA.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       toast({
         title: "Erro na Correção",
-        description: "Não foi possível conectar ao Inspetor Geral. Tente novamente.",
+        description: error.message || "Conexão em manutenção. Por favor, tente em instantes.",
         variant: "destructive",
       });
     } finally {

@@ -128,8 +128,12 @@ Retorne as questões começando cada uma com "Questão X: ".`;
         };
 
         url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        console.log('URL de Destino:', url);
-        console.log('Payload enviado:', JSON.stringify(requestBody));
+
+        if (!apiKey) {
+          alert('Configuração Pendente: Insira a nova API Key');
+          setGerandoQuestoes(false);
+          return;
+        }
       } catch (error) {
         console.error('Erro na preparação do envio:', error);
         throw error;
@@ -151,11 +155,14 @@ Retorne as questões começando cada uma com "Questão X: ".`;
         });
       }
 
+      if (!response.ok) {
+        throw new Error("Conexão em manutenção. Por favor, tente em instantes.");
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('Erro detalhado da API Gemini:', data);
-        throw new Error(data.error?.message || "Erro na resposta da API Gemini");
+        throw new Error(data.error?.message || "Conexão em manutenção. Por favor, tente em instantes.");
       }
 
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -176,9 +183,9 @@ Retorne as questões começando cada uma com "Questão X: ".`;
           }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast({ title: "Erro ao gerar questões", description: "Usando banco de questões padrão.", variant: "destructive" });
+      toast({ title: "Erro ao gerar questões", description: error.message || "Conexão em manutenção. Por favor, tente em instantes.", variant: "destructive" });
     } finally {
       setGerandoQuestoes(false);
     }
@@ -235,8 +242,14 @@ Retorne o feedback formatado:
         };
 
         url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        console.log('URL de Destino:', url);
-        console.log('Payload enviado:', JSON.stringify(requestBody));
+
+        if (!apiKey) {
+          alert('Configuração Pendente: Insira a nova API Key');
+          const novosCorrigindo = [...corrigindo];
+          novosCorrigindo[index] = false;
+          setCorrigindo(novosCorrigindo);
+          return;
+        }
       } catch (error) {
         console.error('Erro na preparação do envio:', error);
         throw error;
@@ -258,11 +271,14 @@ Retorne o feedback formatado:
         });
       }
 
+      if (!response.ok) {
+        throw new Error("Conexão em manutenção. Por favor, tente em instantes.");
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('Erro detalhado da API Gemini:', data);
-        throw new Error(data.error?.message || "Erro na resposta da API Gemini");
+        throw new Error(data.error?.message || "Conexão em manutenção. Por favor, tente em instantes.");
       }
 
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -272,9 +288,9 @@ Retorne o feedback formatado:
         novosFeedbacks[index] = text;
         setFeedbacks(novosFeedbacks);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast({ title: "Erro na Correção", description: "Não foi possível obter o feedback. Tente novamente.", variant: "destructive" });
+      toast({ title: "Erro na Correção", description: error.message || "Conexão em manutenção. Por favor, tente em instantes.", variant: "destructive" });
     } finally {
       const novosCorrigindo = [...corrigindo];
       novosCorrigindo[index] = false;
