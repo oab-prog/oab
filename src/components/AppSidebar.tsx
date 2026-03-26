@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const items1aFase = [
-  { title: "📝 Simulado Real", url: "/simulado", icon: Crosshair },
+  { title: "📝 Simulado Real", url: "/simulado-primeira-fase", icon: Crosshair },
   { title: "🗂️ Flashcards", url: "/etica", icon: Layers },
   { title: "🔎 Buscador de Questões", url: "/buscador", icon: Search },
   { title: "⚖️ Dominando Ética", url: "/etica", icon: Scale },
@@ -25,15 +25,15 @@ const items1aFase = [
 const items2aFase = [
   { title: "✒️ Treino de Peças", url: "/treino-peca", icon: PenTool },
   { title: "✍️ Treino de Discursivas", url: "/treino-discursivas", icon: Edit3 },
-  { title: "🔎 Buscador de Espelhos FGV", url: "/buscador-espelhos", icon: Search },
-  { title: "🦴 Construtor de Esqueletos", url: "/bone", icon: Bone },
+  { title: "🦴 Construtor de Esqueletos", url: "/construtor-esqueletos", icon: Bone },
 ];
 
 const itemsCentralInteligencia = [
   { title: "📊 Radar de Recorrência", url: "/radar-recorrencia", icon: BarChart3 },
-  { title: "⏱️ Calculadora de Prazos", url: "/calculadora-prazos", icon: Clock },
-  { title: "📚 Dicionário de Teses", url: "/teses", icon: BookMarked },
   { title: "📖 Vade Mecum Online", url: "https://www4.planalto.gov.br/legislacao/", icon: BookOpen, external: true },
+  { title: "⏱️ Calculadora de Prazos", url: "/calculadora-prazos", icon: Clock },
+  { title: "🔎 Buscador de Espelhos FGV", url: "/buscador-espelhos", icon: Search },
+  { title: "📚 Dicionário de Teses", url: "/dicionario-teses", icon: BookMarked },
 ];
 
 export function AppSidebar() {
@@ -45,7 +45,7 @@ export function AppSidebar() {
   const canAccess2aFase = isAssinante2aFase;
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border bg-[#020617]">
+    <Sidebar collapsible="icon" className="border-r border-border bg-[#020617] !w-[280px]">
       <SidebarContent className="pt-2 overflow-y-auto">
         <div className="px-4 mb-4">
           {!collapsed ? (
@@ -108,7 +108,7 @@ export function AppSidebar() {
                       <item.icon className={`h-4 w-4 shrink-0 
                         ${location.pathname === item.url ? "text-yellow-400" : "text-white"}
                       `} />
-                      {!collapsed && <span className="text-sm">{item.title}</span>}
+                      {!collapsed && <span className="text-sm whitespace-normal">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -139,7 +139,7 @@ export function AppSidebar() {
                       `} />
                       {!collapsed && (
                         <div className="flex items-center w-full">
-                          <span className={`text-sm truncate ${!canAccess2aFase ? "text-zinc-600" : ""}`}>{item.title}</span>
+                          <span className={`text-sm whitespace-normal ${!canAccess2aFase ? "text-zinc-600" : ""}`}>{item.title}</span>
                           {!isAssinante2aFase && !loading && (
                             <Badge variant="secondary" className="ml-2 text-[9px] px-1.5 py-0 bg-zinc-800 text-zinc-400 hover:bg-zinc-800 border-none rounded-full whitespace-nowrap">
                               🔒 Exclusivo
@@ -174,7 +174,7 @@ export function AppSidebar() {
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white font-semibold hover:bg-white/10 transition-all duration-200"
                       >
                         <item.icon className="h-4 w-4 shrink-0 text-white" />
-                        {!collapsed && <span className="text-sm">{item.title}</span>}
+                        {!collapsed && <span className="text-sm whitespace-normal">{item.title}</span>}
                       </a>
                     ) : (
                       <NavLink
@@ -185,7 +185,7 @@ export function AppSidebar() {
                         <item.icon className={`h-4 w-4 shrink-0 
                           ${location.pathname === item.url ? "text-yellow-400" : "text-white"}
                         `} />
-                        {!collapsed && <span className="text-sm">{item.title}</span>}
+                        {!collapsed && <span className="text-sm whitespace-normal">{item.title}</span>}
                       </NavLink>
                     )}
                   </SidebarMenuButton>

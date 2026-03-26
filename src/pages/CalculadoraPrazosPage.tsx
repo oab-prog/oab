@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, CalendarDays, AlertTriangle, Scale, Info, CheckCircle2 } from "lucide-react";
 import { format, addDays, isWeekend, isBefore, isAfter, isEqual } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -135,24 +134,23 @@ const CalculadoraPrazosPage = () => {
                 Tipo de Peça
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6 space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="piece-type" className="font-bold text-zinc-300">Selecione a Peça Prática</Label>
-                <Select value={pieceDays} onValueChange={setPieceDays}>
-                  <SelectTrigger id="piece-type" className="h-12 border-zinc-800 focus:ring-blue-500 bg-zinc-950 text-white">
-                    <SelectValue placeholder="Selecione o prazo" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
-                    {PIECE_TYPES.map((piece) => (
-                      <SelectItem key={`${piece.label}-${piece.value}`} value={piece.value} className="focus:bg-zinc-800 focus:text-white">
-                        <div className="flex flex-col py-1">
-                          <span className="font-bold text-white">{piece.label}</span>
-                          <span className="text-[10px] uppercase font-black text-blue-400">{piece.area}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <CardContent className="pt-6">
+              <div className="flex flex-col gap-2">
+                <Label className="font-bold text-zinc-300 mb-2">Selecione a Peça Prática</Label>
+                {PIECE_TYPES.map((piece) => (
+                  <button
+                    key={`${piece.label}-${piece.value}`}
+                    onClick={() => setPieceDays(piece.value)}
+                    className={`flex flex-col p-3 rounded-lg border transition-all text-left ${
+                      pieceDays === piece.value
+                        ? "bg-blue-600/20 border-blue-500 text-white"
+                        : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/50"
+                    }`}
+                  >
+                    <span className={`font-bold ${pieceDays === piece.value ? "text-white" : "text-zinc-200"}`}>{piece.label}</span>
+                    <span className={`text-[10px] uppercase font-black ${pieceDays === piece.value ? "text-blue-300" : "text-blue-500"}`}>{piece.area}</span>
+                  </button>
+                ))}
               </div>
             </CardContent>
           </Card>

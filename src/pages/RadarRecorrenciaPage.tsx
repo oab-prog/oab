@@ -185,16 +185,16 @@ const RadarRecorrenciaPage = () => {
                 <CardHeader className="bg-zinc-900/50 border-b border-zinc-800">
                   <div className="flex justify-between items-center">
                     <div>
-                      <CardTitle className="text-2xl font-bold flex items-center gap-2 text-white">
+                      <CardTitle className="text-2xl font-bold flex items-center gap-2 text-[#FFFFFF]">
                         {data.emoji} {data.nome}
                       </CardTitle>
-                      <CardDescription className="text-zinc-400">Distribuição de incidência histórica</CardDescription>
+                      <CardDescription className="text-[#FFFFFF]">Distribuição de incidência histórica</CardDescription>
                     </div>
-                    <TrendingUp className="text-zinc-600 h-8 w-8" />
+                    <TrendingUp className="text-[#FFFFFF] h-8 w-8" />
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <div className="h-[500px] w-full">
+                  <div className="h-[600px] w-full">
                     <ChartContainer config={{
                       value: { label: "Recorrência (%)", color: "#FFFFFF" }
                     }}>
@@ -210,7 +210,7 @@ const RadarRecorrenciaPage = () => {
                             tick={{ fill: '#FFFFFF' }}
                             style={{ fontSize: '13px', fontWeight: 'bold' }}
                           />
-                          <ChartTooltip content={<ChartTooltipContent className="bg-zinc-900 border-zinc-800 text-white" />} />
+                          <ChartTooltip content={<ChartTooltipContent className="bg-zinc-900 border-zinc-800 text-[#FFFFFF]" />} />
                           <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                             {data.pecas.map((entry, index) => (
                               <Cell 
@@ -235,16 +235,16 @@ const RadarRecorrenciaPage = () => {
               <div className="space-y-6">
                 <Card className="border-zinc-800 bg-zinc-900/30 shadow-none">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+                    <CardTitle className="text-sm font-bold uppercase tracking-wider text-[#FFFFFF] flex items-center gap-2">
                       <Target className="h-4 w-4" /> Top Temas
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {data.temas.map((tema, i) => (
                       <div key={i} className="space-y-1">
-                        <div className="flex justify-between text-sm font-bold text-zinc-200">
+                        <div className="flex justify-between text-sm font-bold text-[#FFFFFF]">
                           <span>{tema.name}</span>
-                          <span className={tema.value >= 18 ? "text-red-400" : "text-zinc-400"}>{tema.value}%</span>
+                          <span className="text-[#FFFFFF]">{tema.value}%</span>
                         </div>
                         <Progress 
                           value={tema.value * 3} 
@@ -256,14 +256,14 @@ const RadarRecorrenciaPage = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-zinc-700 bg-zinc-800/50 text-white">
+                <Card className="border-zinc-700 bg-zinc-800/50 text-[#FFFFFF]">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                    <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 text-[#FFFFFF]">
                       <AlertTriangle className="h-4 w-4 text-yellow-400" /> Alerta de Perigo
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-xs text-zinc-300 leading-relaxed font-medium">
+                    <p className="text-xs text-[#FFFFFF] leading-relaxed font-medium">
                       O tema <strong className="text-white underline decoration-yellow-400">"{data.temas[0].name}"</strong> e a peça <strong className="text-white underline decoration-yellow-400">"{data.pecas[0].name}"</strong> representam a maior probabilidade de cobrança nesta matéria. Foque 60% do seu tempo de revisão nestes tópicos.
                     </p>
                   </CardContent>
@@ -277,8 +277,8 @@ const RadarRecorrenciaPage = () => {
                     🎯
                   </div>
                   <div>
-                    <h4 className="font-bold text-white">Estratégia de Peças</h4>
-                    <p className="text-xs text-zinc-400 font-medium">Pratique {data.pecas[0].name} pelo menos 3 vezes.</p>
+                    <h4 className="font-bold text-[#FFFFFF]">Estratégia de Peças</h4>
+                    <p className="text-xs text-[#FFFFFF] font-medium">Pratique {data.pecas[0].name} pelo menos 3 vezes.</p>
                   </div>
                </div>
                <div className="p-4 border border-zinc-800 rounded-xl flex items-center gap-4 bg-zinc-900/30">
@@ -286,8 +286,8 @@ const RadarRecorrenciaPage = () => {
                     📚
                   </div>
                   <div>
-                    <h4 className="font-bold text-white">Base Doutrinária</h4>
-                    <p className="text-xs text-zinc-400 font-medium">Domine {data.temas[0].name} para as questões discursivas.</p>
+                    <h4 className="font-bold text-[#FFFFFF]">Base Doutrinária</h4>
+                    <p className="text-xs text-[#FFFFFF] font-medium">Domine {data.temas[0].name} para as questões discursivas.</p>
                   </div>
                </div>
             </div>

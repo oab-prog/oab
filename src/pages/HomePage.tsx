@@ -14,7 +14,7 @@ export default function HomePage() {
   const method = useScrollReveal(300);
 
   const quickActions = [
-    { title: "Simulado Real", icon: Crosshair, path: "/simulado", desc: "80 questões aleatórias" },
+    { title: "Simulado Real", icon: Crosshair, path: "/simulado-primeira-fase", desc: "80 questões aleatórias" },
     { title: "Buscador", icon: BookOpen, path: "/buscador", desc: "Pesquise no banco completo" },
     { title: "Radar", icon: BarChart3, path: "/radar", desc: "Temas mais recorrentes" },
     { title: "Predição", icon: Scale, path: "/predicao", desc: "Análise para 2026" },
@@ -35,8 +35,18 @@ export default function HomePage() {
       {/* Daily Mission */}
       <Card ref={mission.ref} style={mission.style} className="border-primary/20 bg-primary/5">
         <CardContent className="p-5">
-          <p className="text-xs font-semibold tracking-widest uppercase text-primary mb-2">Missão do Dia</p>
-          <p className="text-foreground text-sm md:text-base leading-relaxed">{missaoHoje}</p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-xs font-semibold tracking-widest uppercase text-primary mb-2">Missão do Dia</p>
+              <p className="text-foreground text-sm md:text-base leading-relaxed">{missaoHoje}</p>
+            </div>
+            <button
+              onClick={() => navigate("/simulado-primeira-fase")}
+              className="whitespace-nowrap bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors"
+            >
+              Começar Agora
+            </button>
+          </div>
         </CardContent>
       </Card>
 

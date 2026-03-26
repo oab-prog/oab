@@ -57,13 +57,13 @@ const App = () => (
               <AppLayout>
                 <Routes>
                   <Route path="/" element={<Index />} /> 
-                  <Route path="/simulado" element={<SimuladoPage />} />
+                  <Route path="/simulado-primeira-fase" element={<SimuladoPage />} />
                   <Route path="/buscador" element={<BuscadorPage />} />
                   <Route path="/radar" element={<RadarPage />} />
                   <Route path="/radar-recorrencia" element={<RadarRecorrenciaPage />} />
                   <Route path="/predicao" element={<PredicaoPage />} />
                   <Route path="/etica" element={<EticaFlashcards />} />
-                  <Route path="/teses" element={<SecondPhaseGuard><DicionarioTeses /></SecondPhaseGuard>} /> {/* <-- NOVA ROTA DE TESES */}
+                  <Route path="/dicionario-teses" element={<SecondPhaseGuard><DicionarioTeses /></SecondPhaseGuard>} /> {/* <-- NOVA ROTA DE TESES */}
                   <Route path="/treino-peca" element={<SecondPhaseGuard><TreinoPecaPage /></SecondPhaseGuard>} /> {/* <-- NOVA ROTA 2ª FASE */}
                   <Route path="/treino-discursivas" element={<SecondPhaseGuard><TreinoDiscursivasPage /></SecondPhaseGuard>} />
                   <Route path="/buscador-espelhos" element={<SecondPhaseGuard><BuscadorEspelhosPage /></SecondPhaseGuard>} />
