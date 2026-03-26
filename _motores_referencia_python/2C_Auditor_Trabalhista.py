@@ -73,8 +73,12 @@ def analisar_lote_ia(caminhos_txt, fatos, callback_progresso, callback_sucesso, 
         
         >>> TRAVA ABSOLUTA ANTI-ALUCINAÇÃO (TOLERÂNCIA ZERO) <<<
         1. PROIBIDO inventar fatos, salários, horários, locais ou testemunhos que não estejam EXPLICITAMENTE ESCRITOS nos dados.
-        2. PROIBIDO inventar números de processos, RO, RR, AIRR ou OJs do TST.
+        2. VALIDAR APENAS legislação trabalhista (CLT e Súmulas/OJs do TST).
         3. Se a informação não existir nos autos, responda: INFORMAÇÃO NÃO ENCONTRADA.
+        4. OBRIGATÓRIO citar as fls. de cada achado.
+
+        >>> RIGOR ESTATÍSTICO OAB (PESO DE CORREÇÃO) <<<
+        Foque com RIGOR na estrutura de: Recurso Ordinário (Rigor 13), Contestação (Rigor 13), Reclamatória (Rigor 8).
         
         >>> REGRA DE FORMATAÇÃO JSON <<<
         O retorno DEVE ser EXCLUSIVAMENTE um objeto JSON válido.

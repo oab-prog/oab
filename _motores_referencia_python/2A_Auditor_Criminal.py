@@ -104,7 +104,11 @@ def analisar_lote_ia(caminhos_txt, fatos, callback_progresso, callback_sucesso, 
         
         >>> TRAVA ABSOLUTA ANTI-ALUCINAÇÃO (TOLERÂNCIA ZERO) <<<
         1. PROIBIDO inventar provas, laudos, interceptações ou locais que não existam nos autos.
-        2. PROIBIDO inventar números de processos, HC, REsp ou Súmulas.
+        2. VALIDAR APENAS legislação penal (CP, CPP, Leis Penais Especiais).
+        3. É OBRIGATÓRIO citar as folhas (fls.) de cada achado nos autos.
+        
+        >>> RIGOR ESTATÍSTICO OAB (PESO DE CORREÇÃO) <<<
+        Foque com RIGOR na estrutura de: Apelação (Rigor 11), Memoriais (Rigor 7), RESE (Rigor 5), Resposta à Acusação (Rigor 5).
         
         >>> REGRA DE FORMATAÇÃO JSON <<<
         O retorno DEVE ser EXCLUSIVAMENTE um objeto JSON válido.
